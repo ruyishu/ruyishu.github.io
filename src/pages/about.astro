@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/BlogPost.astro';
+---
+
+<Layout
+	title="关于"
+	description="关于我 · ZK Blog"
+	pubDate={new Date('2026-09-20')}
+>
+	<p>
+		<em>（这段是占位内容，把方括号里的信息换成你自己的再发布。）</em>
+	</p>
+
+	<p>
+		我是 <strong>[你的名字]</strong>，目前在做 [你的方向，例如：机器学习 / 后端开发]。这里记录我读过的东西、做过的项目，以及一些不太成熟的想法。
+	</p>
+
+	<h2>这个站</h2>
+	<p>
+		用 <a href="https://astro.build/">Astro</a> 生成静态页面，托管在 GitHub Pages，push 即自动部署。文章以 Markdown 存在
+		<a href="https://github.com/ruyishu/ruyishu.github.io">这个仓库</a>里。
+	</p>
+
+	<h2>联系我</h2>
+	<ul>
+		<li>GitHub：<a href="https://github.com/ruyishu">ruyishu</a></li>
+		<li>邮箱：<a href="mailto:[你的邮箱]">[你的邮箱]</a></li>
+		<li>RSS：<a href="/rss.xml">/rss.xml</a></li>
+	</ul>
+</Layout>
