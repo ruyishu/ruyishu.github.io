@@ -497,7 +497,7 @@ const posts = (await getCollection('blog')).sort(
 							</section>
 
 							<!-- 板块 2: 项目仓库 -->
-							<section class="wb-section" id="projects">
+							<section class="wb-section" id="projects" hidden>
 								<div class="section-lead">
 									<h2 class="section-lead-title">02 // 项目工程追踪</h2>
 									<span class="section-lead-tag">Repositories</span>
@@ -509,7 +509,7 @@ const posts = (await getCollection('blog')).sort(
 							</section>
 
 							<!-- 板块 3: 论文学术 -->
-							<section class="wb-section" id="papers">
+							<section class="wb-section" id="papers" hidden>
 								<div class="section-lead">
 									<h2 class="section-lead-title">03 // 学术成果与预印本雷达</h2>
 									<span class="section-lead-tag">Publications</span>
@@ -522,7 +522,7 @@ const posts = (await getCollection('blog')).sort(
 							</section>
 
 							<!-- 板块 4: 实验备忘与待办 -->
-							<section class="wb-section" id="notes">
+							<section class="wb-section" id="notes" hidden>
 								<div class="section-lead">
 									<h2 class="section-lead-title">04 // 实验记录与极客备忘</h2>
 									<span class="section-lead-tag">Lab Scratchpad</span>
@@ -615,23 +615,32 @@ const posts = (await getCollection('blog')).sort(
 					});
 				}
 
-				// 导航高亮联动
+				// 侧边栏切换：一次只展示一个板块，侧边栏常驻
+				const panels = document.querySelectorAll('.wb-section');
 				const navLinks = document.querySelectorAll('.wb-nav-link');
-				function updateHash() {
+
+				function currentTarget() {
 					const hash = window.location.hash.replace('#', '');
-					if (hash) {
-						navLinks.forEach((link) => {
-							if (link.getAttribute('data-target') === hash) {
-								link.classList.add('active');
-							} else {
-								link.classList.remove('active');
-							}
-						});
-					}
+					return document.getElementById(hash) ? hash : 'blog';
 				}
 
-				window.addEventListener('hashchange', updateHash);
-				updateHash();
+				function activate(target) {
+					const panel = document.getElementById(target);
+					if (!panel) return;
+					panels.forEach((item) => {
+						item.hidden = item !== panel;
+					});
+					navLinks.forEach((link) => {
+						link.classList.toggle('active', link.getAttribute('data-target') === target);
+					});
+					panel.scrollIntoView({ block: 'start' });
+				}
+
+				window.addEventListener('hashchange', () => activate(currentTarget()));
+
+				// 通过 /workbench#projects 这类带锚点的链接进来时，直接定位到对应板块
+				if (window.location.hash) activate(currentTarget());
+
 				updateUI();
 			})();
 		</script>
