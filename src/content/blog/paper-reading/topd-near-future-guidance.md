@@ -1,0 +1,204 @@
+---
+title: 'TOPD · 用近未来引导弥合推理轨迹'
+description: '教小模型跟大模型学推理时别逐字纠错：很多「错」只是换了个同义说法，真错要看接下来几步的走向。盯着「近未来」引导，比逐 token 修更管用。'
+pubDate: '2026-07-27'
+---
+
+> 2026-07-27 · 文献阅读 #1 · 方向：On-Policy Distillation / Reasoning RL
+
+## TL;DR
+
+一句话：**教小模型跟大模型学推理时，别逐字纠错——很多"错"只是换了个同义说法，真正的错要看接下来几步的走向；盯着"近未来"去引导，比逐 token 修更管用。**
+
+- **场景**：用大模型（教师）蒸馏小模型（学生）做推理（数学/思维链）。标准做法 OPD = 学生自己走完一条思路，再逐 token 对齐教师。
+- **痛点**：① 约 30% 的"高 loss token"其实只是表面同义改写（如 Therefore vs Thus），不是真错；② 逐 token 修对了，整条思路照样跑偏——推理失败是**轨迹级**现象，不是单 token 的事。
+- **方法 TOPD**：往"未来 k 步"看一眼，判断当前 token 是真发散还是表面噪声；并把监督信号摊到未来多个 token，把后续推理走向拉回教师轨迹。
+- **结果**：平均 47.8%→52.2%，AIME24 60.0→63.3，AIME25 46.7→53.3。只过滤假发散仅 +0.4，加上近未来引导才 +4.4——"识别"和"引导"缺一不可。
+
+## 文献信息
+
+| 字段 | 内容 |
+|-|-|
+| 标题 | Bridging Reasoning Trajectories in On-Policy Distillation via Near-Future Guidance |
+| 作者 | Yuxuan Jiang, Francis Ferraro |
+| 来源 | arXiv 2606.00305 |
+| 时间 | 2026-05-29 v1，2026-06-29 v2 |
+| 链接 | [arxiv.org/abs/2606.00305](https://arxiv.org/abs/2606.00305) |
+
+---
+
+## 一、Motivation：OPD 的"轨迹采样、token 学习"错位
+
+标准 On-Policy Distillation（OPD）让**学生按自己的策略采样整条推理轨迹**，再逐 token 对齐教师分布。问题在于：样本是轨迹级的，监督信号却落在 token 层面——这种"trajectory-sampled, token-learned"机制难以可靠地把学生轨迹拉回教师轨迹。
+
+![图片展示了标准OPD与TOPD的总览对比。左侧为标准OPD，学生按策略采样整条推理轨迹，逐token对齐教师分布，存在“token by token learning trap”问题。右侧是TOPD，引入近未来引导，学生从教师路径中学习未来方向，通过OT对齐，将教师未来方向转移给学生，解决轨迹采样与token学习错位问题。图片直观呈现了两种方法在处理推理轨迹上的差异。](/images/paper-reading/topd-near-future-guidance/2026-07-27-d01-1.png)
+
+*图1 · 标准 OPD 与 TOPD 总览对比。左：标准 OPD 逐 token 修正；右：TOPD 引入近未来引导。*
+
+作者做了两个关键诊断：
+
+**诊断①：约 30% 的高 loss token 是"假发散"。** 在所有高 loss token 中，约 29.23% 实际落在低发散区间——它们只是**表面形式不匹配**（surface-form mismatch，如 "Therefore" vs "Thus"），而非真正的推理偏离。强行学习这些 token 等于注入噪声。
+
+![图片展示了高loss、随机和低loss三类token的OT（最优传输）距离分布情况。上图（a）中，高loss token的OT距离分布呈近似正态分布，而随机和低loss token则更倾向于低发散。下图（b）显示，token loss和OT距离总体上呈现一致趋势，高loss token的近未来发散程度高于随机和低loss token。该图与上下文紧密相关，直观呈现了不同token在OT距离上的差异，为诊断局部token修正不保证轨迹级修正等问题提供数据支持。](/images/paper-reading/topd-near-future-guidance/2026-07-27-d01-2.png)
+
+*图2 · 高 loss / 随机 / 低 loss 三类 token 的 OT（最优传输）距离分布。高 loss token 的发散程度跨度极大，其中相当一部分 OT 距离很低（即"假发散"）。*
+
+**诊断②：局部 token 修正不保证轨迹级修正。** 即便把当前 token 修对了，后续轨迹仍可能跑偏——推理失败本质是**短视距分布漂移**，逐 token 修正对此力不从心。
+
+📎 **图3（case study）**：[点击查看原图](https://arxiv.org/html/2606.00305v2/topd_case.png) — token-by-token 学习陷阱：局部纠正了某个 token，整条推理轨迹依然没有回到教师轨迹上。（原图 1772×887，飞书拉取超时，暂用外链）
+
+---
+
+### 2.1 发散检测：基于 Optimal Transport
+
+对位置 t，比较教师和学生在短窗口（K=50 tokens）内的延续：
+
+```text
+D_OT(T_{t:t+K}, S_{t:t+K}) = min_{γ∈Π(a,b)} Σ_{i,j} γ_{ij} C_{ij}
+
+```
+
+其中 C\_{ij} 是教师和学生在 embedding 空间的 ground cost，γ 是最优传输计划。
+
+**关键发现**：高 loss token 的中位 OT 距离为 0.566，低 loss token 仅 0.315——但高 loss token 的 OT 距离跨度极大，印证"高 loss ≠ 真发散"。
+
+### 2.2 轨迹级 Loss 构造
+
+只在**真发散点**（高 token loss AND 高 OT 距离）施加轨迹监督：
+
+```text
+ỹ_{t+i} = Σ_{j=0}^{K-1} γ_{ij} · onehot(x^T_{t+j})
+L_traj = Σ_{i=0}^{K-1} KL(ỹ_{t+i} ∥ p_S(·|c_{t+i}))
+L_TOPD = L_OPD + λ L_traj
+
+```
+
+OT 传输计划 γ\_{ij} 把教师轨迹信息**软对齐**到多个学生位置，而非逐 token 修正。
+
+### 2.3 算法流程
+
+1. 学生按自己的策略采样完整推理轨迹
+2. 对每个位置 t，计算 K=50 窗口内的 OT 距离
+3. 识别真发散点（高 loss + 高 OT 距离）
+4. 在真发散点构造软目标 ỹ，计算轨迹级 loss
+5. 联合优化 L_OPD + λ L_traj
+
+## 三、Result：识别 + 引导，缺一不可
+
+### 3.1 主结果（Qwen3-4B 为基座）
+
+| 方法 | AIME24 | AIME25 | HMMT25-Feb | 平均 |
+| --- | --- | --- | --- | --- |
+| Qwen3-4B (warm start) | 46.7% | 40.0% | 30.0% | 38.9% |
+| Standard OPD | 60.0% | 46.7% | 36.7% | 47.8% |
+| **TOPD** | **63.3%** | **53.3%** | **40.0%** | **52.2%** |
+
+**关键提升**：AIME25 提升 +6.6 点（46.7→53.3），是最大收益的 benchmark。
+
+### 3.2 消融实验
+
+**识别 vs 引导，缺一不可**：
+
+| 配置 | 平均准确率 | 对比 baseline OPD |
+| --- | --- | --- |
+| Standard OPD | 47.8% | — |
+| 仅过滤非发散 token（低 OT 高 loss 降权） | 48.2% | +0.4 |
+| 匹配高 OT 降权（反向对照） | 42.1% | **-5.7**（严重伤害） |
+| **TOPD（识别 + 引导）** | **52.2%** | **+4.4** |
+
+**结论**：
+
+- 仅过滤假发散（只做"识别"）几乎无效（+0.4）
+- 错误地降权真发散 token 会严重伤害性能（-5.7），反证高 OT token 是核心信号
+- 识别 + 引导结合才有实质提升（+4.4）
+
+### 3.3 Window 分析
+
+论文使用 K=50 tokens，但未系统消融。短窗口探测显示：
+
+- 高 loss token 的中位 OT 距离：0.566
+- 低 loss token 的中位 OT 距离：0.315
+- 高 loss token 的 OT 距离跨度极大（0.2\~0.9），印证"高 loss ≠ 真发散"
+
+---
+
+## 四、Limitations & 未来工作
+
+### 4.1 论文自述的局限
+
+1. **计算开销**：需要短窗口延续比较和 OT 计算，训练成本增加
+2. **短视距分析**：只分析了短程轨迹发散，长程依赖可能遗漏
+3. **任务局限**：实验主要在数学推理 benchmark 上，其他推理任务（代码、逻辑）待验证
+4. **OT 距离的语义局限**：OT 距离度量轨迹接近度，但不总能捕捉语义等价（如不同推理路径到达同一答案）
+
+### 4.2 我认为的真正局限
+
+1. **K=50 的选择缺乏依据**：论文未系统消融 window size，50 是经验值还是最优？
+2. **与 TGPO 等方法的对比缺失**：论文未比较其他 trajectory-aware 方法
+3. **λ 的敏感性**：L_TOPD = L_OPD + λ L_traj，λ 如何选？不同任务是否需要调？
+4. **泛化性存疑**：数学推理的结构化程度高，在更开放的推理任务（如对话、创意写作）是否有效？
+
+### 4.3 未来工作
+
+- 与 TGPO 结合：一个改信号路由，一个改引导方式
+- 长程轨迹建模：从 K=50 扩展到更长窗口
+- 跨任务验证：代码生成、逻辑推理、多步规划
+
+## 五、启发与待跟进
+
+### 5.1 论文已回答的问题
+
+**Q: "近未来"窗口 K 如何选？**
+
+- 论文使用 K=50 tokens，但未给出敏感性分析
+- 中位 OT 距离：高 loss token 0.566 vs 低 loss token 0.315
+- 50 是经验值，缺乏理论依据，可能是局限
+
+**Q: 与 TGPO 的对照？**
+
+- 论文未直接比较 TGPO
+- TOPD 改信号路由（识别真发散），TGPO 改引导方式（教师直接引导 token 生成）
+- 两者正交，理论上可结合
+
+### 5.2 待跟进的问题
+
+- [ ] token 级 KL vs 轨迹级对齐，可类比 RL 中 step-level vs trajectory-level credit assignment——是否同一种"近视"？
+
+- [ ] 与 RLVR（GRPO 等）互补关系：OPD 在无 verifiable reward 时靠教师轨迹提供 dense 过程监督，能否与 RLVR 拼接？
+
+- [ ] 找作者代码/后续工作，确认是否开源实现
+
+- [ ] λ 的敏感性分析：L_TOPD = L_OPD + λ L_traj，不同任务是否需要调 λ？
+
+- [ ] 跨任务泛化：数学推理之外的任务（代码、逻辑、对话）效果如何？
+
+- [ ] 跨任务泛化：数学推理之外的任务（代码、逻辑、对话）效果如何？
+
+### 5.3 未来研究方向建议：与 RLVR 结合
+
+**问题**：TOPD 在无 verifiable reward 时靠教师轨迹提供 dense 过程监督，但数学/代码等任务有 outcome reward。能否把 trajectory-aware 的 process supervision 与 outcome reward 结合？
+
+**思路**：
+
+- 用 TOPD 识别真发散点，作为 process reward
+- 用 RLVR（如 GRPO）优化最终答案
+- Loss = α · L_TOPD + β · L_RLVR
+
+**优势**：
+
+- 结合两种范式的优点：dense process supervision + sparse outcome reward
+- 在数学/代码等有 verifiable reward 的任务上效果更好
+- 理论基础好：process + outcome 是 RL 的经典组合
+
+**挑战**：
+
+- 如何平衡 α 和 β？
+- 两种信号冲突时怎么办？
+
+**实验设计**：
+
+- 数学推理：MATH、GSM8K、AIME
+- 代码生成：HumanEval、MBPP
+- 对比：纯 TOPD、纯 RLVR、TOPD + RLVR
+
+**潜在标题**：*"From Token to Reward: Unifying On-Policy Distillation and RLVR for Reasoning"*
