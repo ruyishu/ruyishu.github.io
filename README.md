@@ -1,4 +1,4 @@
-# ZK Blog
+# 如意鼠 Blog
 
 个人博客。[Astro](https://astro.build) 生成静态站点，托管在 GitHub Pages，push 到 `main` 由 GitHub Actions 自动构建发布。
 

@@ -78,165 +78,6 @@ const posts = (await getCollection('blog')).sort(
 				text-underline-offset: 8px;
 			}
 
-			/* pseudoyu Talks Section Style */
-			.talks-group {
-				margin-bottom: 2.5rem;
-			}
-
-			.group-heading {
-				font-size: 1.15rem;
-				font-weight: 700;
-				color: var(--color-text-main);
-				margin: 1.5rem 0 0.75rem 0;
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-			}
-
-			.talk-item-row {
-				display: flex;
-				align-items: baseline;
-				justify-content: space-between;
-				flex-wrap: wrap;
-				gap: 1rem;
-				padding: 0.85rem 0;
-				border-bottom: 1px dashed var(--color-border);
-				transition: background-color 0.15s ease;
-			}
-
-			.talk-item-row:hover {
-				background-color: var(--color-surface-hover);
-				border-radius: 6px;
-				padding-left: 0.5rem;
-				padding-right: 0.5rem;
-			}
-
-			.talk-left {
-				display: flex;
-				flex-direction: column;
-				gap: 0.25rem;
-				flex: 1;
-				min-width: 280px;
-			}
-
-			.talk-title-line {
-				display: flex;
-				align-items: center;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-			}
-
-			.talk-title-link {
-				font-size: 1rem;
-				font-weight: 600;
-				color: var(--color-text-main);
-				text-decoration: none;
-			}
-
-			.talk-title-link:hover {
-				color: var(--color-accent);
-				text-decoration: underline;
-			}
-
-			.tag-pill {
-				font-family: var(--font-mono);
-				font-size: 0.7rem;
-				padding: 0.1rem 0.45rem;
-				border-radius: 4px;
-				background: var(--color-surface-hover);
-				color: var(--color-text-dim);
-				border: 1px solid var(--color-border);
-			}
-
-			.tag-pill-highlight {
-				background: var(--color-accent-surface);
-				color: var(--color-accent);
-				border-color: var(--color-accent);
-			}
-
-			.talk-meta {
-				font-size: 0.82rem;
-				font-family: var(--font-mono);
-				color: var(--color-text-dim);
-			}
-
-			.talk-actions {
-				display: flex;
-				align-items: center;
-				gap: 0.85rem;
-				font-family: var(--font-mono);
-				font-size: 0.82rem;
-			}
-
-			.talk-btn {
-				display: inline-flex;
-				align-items: center;
-				gap: 0.25rem;
-				color: var(--color-text-muted);
-				opacity: 0.6;
-				text-decoration: none;
-				transition: opacity 0.15s ease, color 0.15s ease;
-			}
-
-			.talk-btn:hover {
-				opacity: 1;
-				color: var(--color-accent);
-				text-decoration: none;
-			}
-
-			/* pseudoyu Projects Grid Style */
-			.projects-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-				gap: 1rem;
-				margin-top: 1rem;
-			}
-
-			.project-item {
-				padding: 1rem 1.15rem;
-				border-radius: 8px;
-				background: var(--color-surface);
-				border: 1px solid var(--color-border);
-				text-decoration: none;
-				display: flex;
-				flex-direction: column;
-				justify-content: space-between;
-				gap: 0.5rem;
-				transition: border-color 0.15s ease, transform 0.15s ease;
-			}
-
-			.project-item:hover {
-				border-color: var(--color-accent);
-				transform: translateY(-2px);
-				text-decoration: none;
-			}
-
-			.project-header {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			.project-name {
-				font-size: 1.05rem;
-				font-weight: 600;
-				color: var(--color-text-main);
-			}
-
-			.project-desc {
-				font-size: 0.88rem;
-				color: var(--color-text-dim);
-				margin: 0;
-				line-height: 1.5;
-			}
-
-			.project-tags {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.35rem;
-				margin-top: 0.25rem;
-			}
-
 			/* Posts List Style */
 			.posts-list {
 				list-style: none;
@@ -316,21 +157,22 @@ const posts = (await getCollection('blog')).sort(
 					</div>
 
 					<p class="bio-paragraph">
-						你好，我是 <strong>章坤 (ZK)</strong>，大模型算法工程师。关注大语言模型与多模态模型的训练优化（SFT、GRPO、蒸馏）、长音频推理与自动化评测闭环。
+						你好，我是 <strong>如意鼠</strong>，大模型算法工程师。关注大语言模型与多模态模型的训练优化（SFT、GRPO、蒸馏）、长音频推理与自动化评测闭环。
 					</p>
 
 					<p class="bio-paragraph">
-						教育背景：<strong>清华大学</strong>（硕士研究生）· <strong>安徽大学</strong>（学士）。
+						硕士毕业于 <strong>清华大学</strong>，本科毕业于 <strong>安徽大学</strong>。
 					</p>
 
 					<p class="bio-paragraph" style="font-size: 0.92rem; color: var(--color-text-dim);">
-						你可以浏览我的 <a href="/blog">技术博客文章</a>，或者查看 <a href="/about">关于我</a>。欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 或邮件 <a href="mailto:kunzhang19970209@gmail.com" style="font-family: var(--font-mono); color: var(--color-text-main);">kunzhang19970209@gmail.com</a> 交流。
+						你可以浏览我的 <a href="/blog">技术博客文章</a>，或者查看 <a href="/about">关于我</a>。欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 交流。
 					</p>
 				</section>
 
-				<!-- 大字切换 Tabs (Posts · About) -->
+				<!-- 大字切换 Tabs (Posts · Workbench · About) -->
 				<nav class="subnav-tabs" aria-label="Page Sections">
 					<a href="/blog" class="subnav-tab active">Posts</a>
+					<a href="/workbench" class="subnav-tab">Workbench</a>
 					<a href="/about" class="subnav-tab">About</a>
 				</nav>
 
@@ -362,6 +204,12 @@ const posts = (await getCollection('blog')).sort(
 						</a>
 					</div>
 				</section>
+				<!-- pseudoyu 风格的终端引导跳转 (cd ./workbench) -->
+				<div class="terminal-cd-jump">
+					<span style="opacity: 0.5;">&gt;</span>
+					<span>进入博主专属控制台：</span>
+					<a href="/workbench" class="terminal-cd-link">cd ./workbench</a>
+				</div>
 			</div>
 		</main>
 		<Footer />

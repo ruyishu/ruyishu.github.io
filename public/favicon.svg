@@ -2,7 +2,7 @@
   <defs>
     <style>
       .bg { fill: #0f172a; transition: fill 0.2s ease; }
-      .text { fill: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 58px; font-weight: 800; letter-spacing: -2px; }
+      .text { fill: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 58px; font-weight: 800; letter-spacing: -2px; }
       .accent { fill: #38bdf8; }
       @media (prefers-color-scheme: dark) {
         .bg { fill: #1e293b; }
@@ -12,5 +12,5 @@
     </style>
   </defs>
   <rect class="bg" width="128" height="128" rx="28" />
-  <text class="text" x="64" y="82" text-anchor="middle">Z<tspan class="accent">K</tspan></text>
+  <text class="text" x="64" y="82" text-anchor="middle">如<tspan class="accent">意</tspan></text>
 </svg>
