@@ -1,26 +1,13 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { postsByCategory } from '../../utils/blog';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-// 按年份对文章进行分组归档
-const postsByYear = posts.reduce((acc, post) => {
-	const year = post.data.pubDate.getFullYear().toString();
-	if (!acc[year]) {
-		acc[year] = [];
-	}
-	acc[year].push(post);
-	return acc;
-}, {} as Record<string, typeof posts>);
-
-const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+const groups = (await postsByCategory()).filter((group) => group.posts.length > 0);
+const total = groups.reduce((count, group) => count + group.posts.length, 0);
 ---
 
 <!doctype html>
@@ -45,11 +32,11 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 				font-size: 0.95rem;
 			}
 
-			.year-section {
+			.group-section {
 				margin-bottom: 2.5rem;
 			}
 
-			.year-title {
+			.group-title {
 				font-size: 1.35rem;
 				font-weight: 700;
 				color: var(--color-text-dim);
@@ -59,7 +46,7 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 				gap: 0.75rem;
 			}
 
-			.year-title::after {
+			.group-title::after {
 				content: '';
 				flex: 1;
 				height: 1px;
@@ -138,16 +125,16 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 			<section class="archive-header">
 				<h1 class="archive-title">文章归档</h1>
 				<p class="archive-desc">
-					共 {posts.length} 篇技术笔记与随笔。文字优先，记录系统设计、算法实验与实践反思。
+					共 {total} 篇技术笔记与随笔。文字优先，记录系统设计、算法实验与实践反思。
 				</p>
 			</section>
 
 			{
-				years.map((year) => (
-					<section class="year-section">
-						<h2 class="year-title">{year}</h2>
+				groups.map((group) => (
+					<section class="group-section">
+						<h2 class="group-title">{group.category.label}</h2>
 						<ul class="post-list">
-							{postsByYear[year].map((post) => (
+							{group.posts.map((post) => (
 								<li class="post-item">
 									<div class="post-meta">
 										<FormattedDate date={post.data.pubDate} />

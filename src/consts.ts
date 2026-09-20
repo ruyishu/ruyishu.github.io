@@ -9,3 +9,12 @@ export const SITE_AUTHOR = '如意鼠';
 // 这只是显示偏好，不是访问控制——工作台内容始终存在于生成的 HTML 里。
 export const WORKBENCH_PUBLIC_DEFAULT = false;
 
+// 博客分类：一个分类 = src/content/blog/<slug>/ 一个文件夹 + 侧边栏一个子项。
+// 新增分类只需在这里加一条，再把文章放进同名文件夹，侧边栏与归档页会自动跟上。
+export const BLOG_CATEGORIES = [
+	{ slug: 'tech-report', label: '技术报告' },
+	{ slug: 'papers', label: '热门论文' },
+	{ slug: 'trends', label: '前沿热点' },
+	{ slug: 'misc', label: '杂项' },
+] as const;
+

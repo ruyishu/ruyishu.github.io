@@ -1,14 +1,13 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE, WORKBENCH_PUBLIC_DEFAULT } from '../consts';
+import { postsByCategory } from '../utils/blog';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const blogGroups = await postsByCategory();
+const postCount = blogGroups.reduce((total, group) => total + group.posts.length, 0);
 ---
 
 <!doctype html>
@@ -180,6 +179,7 @@ const posts = (await getCollection('blog')).sort(
 			}
 
 			.wb-sidebar.collapsed .nav-label,
+			.wb-sidebar.collapsed .nav-tail,
 			.wb-sidebar.collapsed .nav-count {
 				display: none;
 			}
@@ -188,6 +188,59 @@ const posts = (await getCollection('blog')).sort(
 				font-family: var(--font-mono);
 				font-size: 0.75rem;
 				color: var(--color-text-dim);
+			}
+
+			/* 侧边栏：博客内容是可展开的分组 */
+			.wb-nav-parent {
+				width: 100%;
+				background: transparent;
+				border: none;
+				font: inherit;
+				text-align: left;
+				cursor: pointer;
+			}
+
+			.nav-tail {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35rem;
+			}
+
+			.nav-chevron {
+				transition: transform 0.15s ease;
+			}
+
+			.wb-nav-group.collapsed .nav-chevron {
+				transform: rotate(-90deg);
+			}
+
+			.wb-nav-group.collapsed .wb-sublist,
+			.wb-sidebar.collapsed .wb-sublist {
+				display: none;
+			}
+
+			.wb-sublist {
+				list-style: none;
+				margin: 0.15rem 0 0 0;
+				padding: 0 0 0 0.7rem;
+				border-left: 1px solid var(--color-border);
+				display: flex;
+				flex-direction: column;
+				gap: 0.15rem;
+			}
+
+			.wb-nav-child {
+				padding-left: 0.5rem;
+				font-size: 0.92em;
+			}
+
+			@media (max-width: 768px) {
+				.wb-sublist {
+					flex-direction: row;
+					flex-wrap: wrap;
+					border-left: none;
+					padding-left: 0;
+				}
 			}
 
 			/* Main View */
@@ -400,39 +453,65 @@ const posts = (await getCollection('blog')).sort(
 						</div>
 
 						<ul class="wb-nav">
-							<li>
-								<a href="#blog" class="wb-nav-link active" data-target="blog">
-									<div class="nav-text-group">
+							<li class="wb-nav-group" id="nav-group-blog">
+								<button
+									type="button"
+									class="wb-nav-link wb-nav-parent"
+									id="blog-group-toggle"
+									aria-expanded="true"
+									aria-controls="blog-sublist"
+									title="展开/收起博客分类"
+								>
+									<span class="nav-text-group">
 										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
 										<span class="nav-label">博客内容</span>
-									</div>
-									<span class="nav-count">{posts.length}</span>
-								</a>
+									</span>
+									<span class="nav-tail">
+										<span class="nav-count">{postCount}</span>
+										<svg class="nav-chevron" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+									</span>
+								</button>
+								<ul class="wb-sublist" id="blog-sublist">
+									{
+										blogGroups.map((group, index) => (
+											<li>
+												<a
+													href={`#blog-${group.category.slug}`}
+													class={`wb-nav-link wb-nav-child${index === 0 ? ' active' : ''}`}
+													data-target={`blog-${group.category.slug}`}
+												>
+													<span class="nav-label">{group.category.label}</span>
+													<span class="nav-count">{group.posts.length}</span>
+												</a>
+											</li>
+										))
+									}
+								</ul>
 							</li>
 							<li>
 								<a href="#projects" class="wb-nav-link" data-target="projects">
-									<div class="nav-text-group">
+									<span class="nav-text-group">
 										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
 										<span class="nav-label">项目仓库</span>
-									</div>
+									</span>
 									<span class="nav-count">0</span>
 								</a>
 							</li>
 							<li>
 								<a href="#papers" class="wb-nav-link" data-target="papers">
-									<div class="nav-text-group">
+									<span class="nav-text-group">
 										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
 										<span class="nav-label">论文学术</span>
-									</div>
+									</span>
 									<span class="nav-count">0</span>
 								</a>
 							</li>
 							<li>
 								<a href="#notes" class="wb-nav-link" data-target="notes">
-									<div class="nav-text-group">
+									<span class="nav-text-group">
 										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"></path><path d="M8.5 2h7"></path><path d="M7 16h10"></path></svg>
 										<span class="nav-label">实验备忘</span>
-									</div>
+									</span>
 									<span class="nav-count">0</span>
 								</a>
 							</li>
@@ -455,46 +534,54 @@ const posts = (await getCollection('blog')).sort(
 
 						<!-- 四大工作板块 -->
 						<div id="unlocked-dashboard" style="display: flex; flex-direction: column; gap: 2.5rem;">
-							<!-- 板块 1: 博客文章 -->
-							<section class="wb-section" id="blog">
-								<div class="section-lead">
-									<h2 class="section-lead-title">01 // 博客文章与内容库</h2>
-									<span class="section-lead-tag">Astro Content Collections</span>
-								</div>
-								<table class="wb-table">
-									<thead>
-										<tr>
-											<th>Title / Path</th>
-											<th>Date</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tbody>
-										{
-											posts.map((post) => (
-												<tr>
-													<td>
-														<a href={`/blog/${post.id}/`} style="font-weight: 600; text-decoration: none;">
-															{post.data.title}
-														</a>
-														<div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-dim);">
-															src/content/blog/{post.id}.md
-														</div>
-													</td>
-													<td style="font-family: var(--font-mono); color: var(--color-text-dim);">
-														<FormattedDate date={post.data.pubDate} />
-													</td>
-													<td>
-														<a href={`/blog/${post.id}/`} style="color: var(--color-accent); font-family: var(--font-mono); font-size: 0.8rem;">
-															查看
-														</a>
-													</td>
-												</tr>
-											))
-										}
-									</tbody>
-								</table>
-							</section>
+							<!-- 板块 1: 博客内容，按分类一个面板 -->
+							{
+								blogGroups.map((group, index) => (
+									<section class="wb-section" id={`blog-${group.category.slug}`} hidden={index !== 0}>
+										<div class="section-lead">
+											<h2 class="section-lead-title">01.{index + 1} // {group.category.label}</h2>
+											<span class="section-lead-tag">{group.posts.length} 篇</span>
+										</div>
+										{group.posts.length > 0 ? (
+											<table class="wb-table">
+												<thead>
+													<tr>
+														<th>Title / Path</th>
+														<th>Date</th>
+														<th>Action</th>
+													</tr>
+												</thead>
+												<tbody>
+													{group.posts.map((post) => (
+														<tr>
+															<td>
+																<a href={`/blog/${post.id}/`} style="font-weight: 600; text-decoration: none;">
+																	{post.data.title}
+																</a>
+																<div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-dim);">
+																	src/content/blog/{post.id}.md
+																</div>
+															</td>
+															<td style="font-family: var(--font-mono); color: var(--color-text-dim);">
+																<FormattedDate date={post.data.pubDate} />
+															</td>
+															<td>
+																<a href={`/blog/${post.id}/`} style="color: var(--color-accent); font-family: var(--font-mono); font-size: 0.8rem;">
+																	查看
+																</a>
+															</td>
+														</tr>
+													))}
+												</tbody>
+											</table>
+										) : (
+											<p style="margin: 0; font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-text-dim);">
+												暂无记录。
+											</p>
+										)}
+									</section>
+								))
+							}
 
 							<!-- 板块 2: 项目仓库 -->
 							<section class="wb-section" id="projects" hidden>
@@ -618,10 +705,17 @@ const posts = (await getCollection('blog')).sort(
 				// 侧边栏切换：一次只展示一个板块，侧边栏常驻
 				const panels = document.querySelectorAll('.wb-section');
 				const navLinks = document.querySelectorAll('.wb-nav-link');
+				const blogGroup = document.getElementById('nav-group-blog');
+				const blogGroupToggle = document.getElementById('blog-group-toggle');
+
+				function defaultTarget() {
+					const first = document.querySelector('.wb-nav [data-target]');
+					return first ? first.getAttribute('data-target') : '';
+				}
 
 				function currentTarget() {
 					const hash = window.location.hash.replace('#', '');
-					return document.getElementById(hash) ? hash : 'blog';
+					return document.getElementById(hash) ? hash : defaultTarget();
 				}
 
 				function activate(target) {
@@ -633,12 +727,25 @@ const posts = (await getCollection('blog')).sort(
 					navLinks.forEach((link) => {
 						link.classList.toggle('active', link.getAttribute('data-target') === target);
 					});
+					// 选中博客子分类时，保证父级分组是展开的
+					if (target.startsWith('blog-') && blogGroup) {
+						blogGroup.classList.remove('collapsed');
+						blogGroupToggle?.setAttribute('aria-expanded', 'true');
+					}
 					panel.scrollIntoView({ block: 'start' });
+				}
+
+				// 点分组标题只做展开/收起，不改变当前板块
+				if (blogGroup && blogGroupToggle) {
+					blogGroupToggle.addEventListener('click', () => {
+						const collapsed = blogGroup.classList.toggle('collapsed');
+						blogGroupToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+					});
 				}
 
 				window.addEventListener('hashchange', () => activate(currentTarget()));
 
-				// 通过 /workbench#projects 这类带锚点的链接进来时，直接定位到对应板块
+				// 通过 /workbench#blog-papers 这类带锚点的链接进来时，直接定位到对应板块
 				if (window.location.hash) activate(currentTarget());
 
 				updateUI();

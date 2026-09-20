@@ -11,7 +11,18 @@ npm install        # 首次
 npm run dev        # 本地预览，http://localhost:4321
 ```
 
-新增一篇文章：在 `src/content/blog/` 下建一个 `.md` 文件，文件名就是 URL（`foo-bar.md` → `/blog/foo-bar/`）。
+新增一篇文章：在 `src/content/blog/<分类>/` 下建一个 `.md` 文件。文件名就是 URL：`tech-report/foo-bar.md` → `/blog/tech-report/foo-bar/`。
+
+文章分类是**按文件夹**定的，四个方向：
+
+| 文件夹 | 侧边栏显示 | 放什么 |
+| --- | --- | --- |
+| `tech-report/` | 技术报告 | 系统设计、算法实验、工程实践 |
+| `papers/` | 热门论文 | 论文精读与复现笔记 |
+| `trends/` | 前沿热点 | 动态跟踪、方向判断 |
+| `misc/` | 杂项 | 其他 |
+
+分类清单在 `src/consts.ts` 的 `BLOG_CATEGORIES`。加一条配置 + 建同名文件夹就是一个新分类，工作台侧边栏和 `/blog` 归档页都从这份配置生成，不用改页面。放在 `src/content/blog/` 根目录或未配置文件夹里的文章会归到「未分类」，不会被漏掉。
 
 ```markdown
 ---
@@ -43,6 +54,8 @@ git push
 | 需求 | 文件 |
 | --- | --- |
 | 站名、简介、作者 | `src/consts.ts` |
+| 博客分类（侧边栏子项、归档分组） | `src/consts.ts` 的 `BLOG_CATEGORIES` |
+| 工作台各板块内容 | `src/pages/workbench.astro` |
 | 导航菜单、社交图标 | `src/components/Header.astro` |
 | 页脚 | `src/components/Footer.astro` |
 | 「关于」页 | `src/pages/about.astro` |
