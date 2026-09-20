@@ -312,110 +312,29 @@ const posts = (await getCollection('blog')).sort(
 				<section class="intro-section">
 					<h1 class="author-name">{SITE_TITLE}</h1>
 					<div class="author-tagline">
-						机器学习与系统优化开发者 · 探索大规模分布式训练与高效推理系统
+						大模型算法工程师 · 聚焦模型训练、推理效率与评测分析
 					</div>
 
 					<p class="bio-paragraph">
-						你好，我是 <strong>{SITE_TITLE}</strong>，专注于 LLM 推理加速运行时、异构 GPU 集群分布式调度优化以及底层算子融合实现。
+						你好，我是 <strong>章坤 (ZK)</strong>，大模型算法工程师。关注大语言模型与多模态模型的训练优化（SFT、GRPO、蒸馏）、长音频推理与自动化评测闭环。
 					</p>
 
 					<p class="bio-paragraph">
-						教育背景：<strong>[你的学校]</strong> · 计算机科学与技术 / 人工智能方向。日常在实验室与工程落地中推进科研项目，记录系统设计与踩坑反思。
+						教育背景：<strong>清华大学</strong>（硕士研究生）· <strong>安徽大学</strong>（学士）。
 					</p>
 
 					<p class="bio-paragraph" style="font-size: 0.92rem; color: var(--color-text-dim);">
-						你可以浏览我的 <a href="#projects">精选开源工程</a>、查阅 <a href="#talks">学术论文与演讲</a>，或者查看全部 <a href="/blog">技术博客文章</a>。如有交流需要，欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 或邮件 <span style="font-family: var(--font-mono);">[你的邮箱]</span> 联系。
+						你可以浏览我的 <a href="#projects">精选项目</a>，或者查看全部 <a href="/blog">技术博客文章</a>。欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 或邮件 <a href="mailto:kunzhang19970209@gmail.com" style="font-family: var(--font-mono); color: var(--color-text-main);">kunzhang19970209@gmail.com</a> 交流。
 					</p>
 				</section>
 
-				<!-- 标志性大字切换 Tabs (Blog · Projects · Talks · Workbench) -->
+				<!-- 标志性大字切换 Tabs (Projects · Blog · Workbench · About) -->
 				<nav class="subnav-tabs" aria-label="Page Sections">
-					<a href="#talks" class="subnav-tab active">Talks &amp; Papers</a>
-					<a href="#projects" class="subnav-tab">Projects</a>
+					<a href="#projects" class="subnav-tab active">Projects</a>
 					<a href="/blog" class="subnav-tab">Blog</a>
 					<a href="/workbench" class="subnav-tab">Workbench</a>
 					<a href="/about" class="subnav-tab">About</a>
 				</nav>
-
-				<!-- 核心板块 1: 学术成果与演讲 (严格遵循 pseudoyu.com/talks 经典排版) -->
-				<section id="talks" style="scroll-margin-top: 5rem;">
-					<div class="watermark-container">
-						<span class="watermark-text">Talks</span>
-						<h2 class="section-anchor">Latest Talks &amp; Papers</h2>
-					</div>
-
-					<!-- SysML 成果 -->
-					<div class="talks-group">
-						<h3 class="group-heading">
-							<span>SysML 2026</span>
-							<span style="font-weight: 400; font-size: 0.85rem; color: var(--color-text-dim);">· San Jose, CA</span>
-						</h3>
-						<div class="talk-item-row">
-							<div class="talk-left">
-								<div class="talk-title-line">
-									<a href="/workbench#papers" class="talk-title-link">
-										Efficient Tensor Parallelism and Memory Optimization for Large-Scale Transformer Systems
-									</a>
-									<span class="tag-pill tag-pill-highlight">CCF-A</span>
-									<span class="tag-pill">Camera-Ready</span>
-								</div>
-								<div class="talk-meta">
-									[你的名字], Collaborators · Conference on Machine Learning and Systems · 2026
-								</div>
-							</div>
-							<div class="talk-actions">
-								<a href="#" class="talk-btn" title="阅读预印本 PDF">
-									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-									PDF
-								</a>
-								<a href="#" class="talk-btn" title="查看演示文稿">
-									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-									Slides
-								</a>
-								<a href="#" class="talk-btn" title="复现代码仓库">
-									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
-									Code
-								</a>
-							</div>
-						</div>
-					</div>
-
-					<!-- ICML Workshop -->
-					<div class="talks-group">
-						<h3 class="group-heading">
-							<span>ICML Workshop 2025</span>
-							<span style="font-weight: 400; font-size: 0.85rem; color: var(--color-text-dim);">· Vienna / Online</span>
-						</h3>
-						<div class="talk-item-row">
-							<div class="talk-left">
-								<div class="talk-title-line">
-									<a href="/workbench#papers" class="talk-title-link">
-										Low-Latency Speculative Decoding with Dynamic Draft Verification
-									</a>
-									<span class="tag-pill tag-pill-highlight">ICML '25</span>
-									<span class="tag-pill">Published</span>
-								</div>
-								<div class="talk-meta">
-									[你的名字], Research Advisor · Efficient Foundation Models Workshop · 2025
-								</div>
-							</div>
-							<div class="talk-actions">
-								<a href="#" class="talk-btn" title="观看录播">
-									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-									Watch
-								</a>
-								<a href="#" class="talk-btn" title="查看演示文稿">
-									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-									Slides
-								</a>
-								<a href="#" class="talk-btn" title="阅读论文全文">
-									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-									PDF
-								</a>
-							</div>
-						</div>
-					</div>
-				</section>
 
 				<!-- 核心板块 2: 精选项目 (遵循 pseudoyu.com/projects 现代网格卡片) -->
 				<section id="projects" style="scroll-margin-top: 5rem; margin-top: 3.5rem;">
