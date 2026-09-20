@@ -52,7 +52,7 @@ pubDate: '2026-09-11'
 - **读表**：OpenVLA 原生模型在多模态理解上**全是 0**（它就不是个通用 VLM）；微调后恢复了一点但还是残废（OCRBench 2.5，等于不会读字）；**InstructVLA 用 1.5B 就拿到了 44.2 / 56.2 / 814 / 76.1——不但没退化，还小幅超过它的骨干 Eagle2**（43.1 / 56.4 / 818 / 74.9）
 - **最直接的反例**：**"不许想，直接动手"比"先想一遍再动手"差 36.1%**——同一模型，打开文本推理（Generalist w Think 47）vs 关掉（w/o Think 34），操作成功率直接差一个档
 
-![图片展示了InstructVLA模型的多模态能力框架。中心为InstructVLA，围绕其有四个部分：1. 多模态知识，包含视觉 - 语言知识、多模态Web数据；2. 体感理解，有RWQA、Captioning、GA等；3. 原子指令操作，有大规模交互注释、异构体感等；4. 推理指导操作，有闭合环推理评估等。该图与上下文紧密相关，直观呈现了InstructVLA在多模态理解、体感理解、指令操作及推理指导操作等方面的能力构成。](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-1.png)
+![图片展示了InstructVLA模型的多模态能力框架。中心为InstructVLA，围绕其有四个部分：1. 多模态知识，包含视觉 - 语言知识、多模态Web数据；2. 体感理解，有RWQA、Captioning、GA等；3. 原子指令操作，有大规模交互注释、异构体感等；4. 推理指导操作，有闭合环推理评估等。该图与上下文紧密相关，直观呈现了InstructVLA在多模态理解、体感理解、指令操作及推理指导操作等方面的能力构成。](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-1.webp)
 
 ▲ 论文 Figure 1：方法总览——把「视觉语言知识 / 具身理解 / 原子指令操作 / 推理引导的操作」四件事串成一条链，核心训练策略是 VLA-IT
 
@@ -77,7 +77,7 @@ pubDate: '2026-09-11'
 
 ## 三、方法：一个 VLM + 两个专家 + 两阶段训练
 
-![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-2.png)
+![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-2.webp)
 
 ▲ 论文 Figure 2：模型架构——(1) 语言回复（VLM 自回归生成）(2) latent action（MoE 适配产出）(3) 动作（动作专家 flow matching 解码）；SigLIP 供 VLM，DINOv2+FiLM 供动作专家
 
@@ -96,7 +96,7 @@ pubDate: '2026-09-11'
 
 ### 3.3 数据：650K 条 VLA-IT 语料（Figure 3）
 
-![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-3.png)
+![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-3.webp)
 
 ▲ 论文 Figure 3：VLA-IT 语料四类标注——左侧原数据；中间「具身场景理解」（场景描述 + 问答）；右侧「指令理解与规划」（指令改写：工具/材质/外观；上下文创建：情境/新动作/长程）
 
@@ -148,7 +148,7 @@ pubDate: '2026-09-11'
 - **Expert 版**（Stage-1 产物）在 SimplerEnv 上与 SpatialVLA 相比，论文摘要给出 33% 提升（Table 2 中 Expert 平均 50.9 vs SpatialVLA 45.9，口径以论文为准）
 - **注意 GPT-4o 外挂这条路为什么输**：GPT-4o 在**指令改写**上同样会犯错（没有真值指令时退化），所以外挂再强，指令解释这一环就漏了——**这也是本作强调"自带推理"的核心论据**
 
-![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-4.png)
+![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-4.webp)
 
 ▲ 论文 Figure 4：SimplerEnv-Instruct 代表案例——左：任务聚合（复杂对象指代、多语言指代，含法语指令）；右：情境推理（工具使用、子任务起止、否定任务）
 
@@ -156,7 +156,7 @@ pubDate: '2026-09-11'
 
 ### 4.3 真实世界（Figure 5）
 
-![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-5.png)
+![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-5.webp)
 
 ▲ 论文 Figure 5：真实世界实验——WidowX-250 零样本（Bridge 厨房环境）+ Franka Research 3 few-shot；含数学推理任务（「52/2=? 答案是 26，所以我拿黄色积木」）
 
@@ -189,7 +189,7 @@ pubDate: '2026-09-11'
 
 **（3）训练策略与冻结（Figure 6）**
 
-![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-6.png)
+![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-6.webp)
 
 ▲ 论文 Figure 6：(a) 冻结 vs 微调动作专家（效果持平，冻结更省参数）(b) 四种训练范式对比 FFT / AR(Magma) / InstructVLA-MoE / InstructVLA
 
@@ -198,7 +198,7 @@ pubDate: '2026-09-11'
 
 **（4）数据规模与"想不想"（Figure 7）**
 
-![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-7.png)
+![](/images/paper-reading/2026-09-11-instructvla/2026-09-11-d36-7.webp)
 
 ▲ 论文 Figure 7：(a) VLA-IT 数据规模化——情境推理随标注量涨得最猛，微调的 OpenVLA 几乎不动 (b) 训练与推理消融——Generalist w Think 47 > w/o Think 34（+36.1%）> Expert+GPT 35
 

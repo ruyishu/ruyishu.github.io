@@ -73,7 +73,7 @@ MiniCPM5-2B 是 1B 配方在参数规模上的直接放大（README 原文：sca
 
 结论一句话：**对比组内平均 53.9 分，2B 级开源 SOTA，且同时超过组内所有更大的 4B 级参考模型（最高 51.1）。**官方自己总结其优势最突出在五个域：代码推理、数学推理、长上下文理解、工具使用与多个 agentic 任务。下图是官方发布的「分域能力雷达图」——注意它只绘制了最具代表性的四个模型（MiniCPM5-2B、Qwen3.5-4B、granite-4.2-3B、LFM2.5-2.6B），九个轴分别是 Code Reasoning、Math Reasoning、Instruction Following、General Knowledge、Long Context、Tool Use、Coding Agent、Search Agent、General Agent，轴最大值为 100%：
 
-![这是MiniCPM5-2B等四个模型的分域能力雷达图，对比覆盖Code Reasoning、Math Reasoning、Instruction Following等九个领域的表现，各领域轴最大值为100%。其中MiniCPM5-2B以蓝色标识，平均得分53.9，在Code Reasoning领域达到满分100%，Long Context、Tool Use等领域也处于领先位置。Qwen3.5-4B以红色标识，平均得分51.1，在Search Agent、Coding Agent领域表现突出。granite-4.2-3B以绿色标识，平均得分42.7，在Instruction Following领域得分接近满分。LFM2.5-2.6B以橙色标识，平均得分33.2，整体在各领域的表现均弱于另外三个模型。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--1.png)
+![这是MiniCPM5-2B等四个模型的分域能力雷达图，对比覆盖Code Reasoning、Math Reasoning、Instruction Following等九个领域的表现，各领域轴最大值为100%。其中MiniCPM5-2B以蓝色标识，平均得分53.9，在Code Reasoning领域达到满分100%，Long Context、Tool Use等领域也处于领先位置。Qwen3.5-4B以红色标识，平均得分51.1，在Search Agent、Coding Agent领域表现突出。granite-4.2-3B以绿色标识，平均得分42.7，在Instruction Following领域得分接近满分。LFM2.5-2.6B以橙色标识，平均得分33.2，整体在各领域的表现均弱于另外三个模型。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--1.webp)
 
 **图 1 · MiniCPM5-2B 分域能力雷达图（来源：OpenBMB/MiniCPM 仓库 assets/minicpm5_2b_public_leaderboard_radar_en.png）**
 
@@ -83,7 +83,7 @@ MiniCPM5-2B 是 1B 配方在参数规模上的直接放大（README 原文：sca
 
 官方另发布了一张完整的公开榜单对比图，覆盖全部 9 个模型 × 34 项基准，并带行内最优加粗与 † 标注（蓝色圆点 = 全场最佳，黑色圆点 = 2B 组最佳；† = 分数来自 AA 官方发布，其余为面壁内部复现）。原图如下，其后附与模型卡一致的逐项数值表（便于检索与引用）：
 
-![图片展示了MiniCPM5-2B与基线模型在28个类别和48个类别模型上的评估结果。其中，MiniCPM5-2B在28个类别模型中平均得分为53.9，各项能力如代码推理、数学推理等均有具体得分；在48个类别模型中，平均得分为32.1。各模型在不同类别下的得分也呈现出来，如MiniCPM5-2B在Code Reasoning类别中得分为69.1，在Math Reasoning类别中得分为86.5等。该图与上下文紧密相关，直观呈现了MiniCPM5-2B在基准测试中的表现。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--2.png)
+![图片展示了MiniCPM5-2B与基线模型在28个类别和48个类别模型上的评估结果。其中，MiniCPM5-2B在28个类别模型中平均得分为53.9，各项能力如代码推理、数学推理等均有具体得分；在48个类别模型中，平均得分为32.1。各模型在不同类别下的得分也呈现出来，如MiniCPM5-2B在Code Reasoning类别中得分为69.1，在Math Reasoning类别中得分为86.5等。该图与上下文紧密相关，直观呈现了MiniCPM5-2B在基准测试中的表现。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--2.webp)
 
 **图 2 · MiniCPM5-2B 公开榜单对比（来源：assets/minicpm5_2b_public_leaderboard_en.png）**
 
@@ -162,7 +162,7 @@ MiniCPM5-2B 的训练是 **UltraData 分层数据管理**（arXiv 2602.09003 提
 
 官方把 RL + OPD 称为 MiniCPM5-2B 后训练的 key part。RL 阶段采用基于 critic 的算法（即下文 JustRL II 的技术文档所述方案），显著改善小模型长思维链 RL 的训练稳定性并带来跨域提升；OPD 则把 RL 阶段训出的 **16 个领域专家模型（含 5 个智能体专家）**合并回一个发布模型。官方公布的增益数字：在下列基准上，RL + OPD 使推理与通用能力平均提升 **↑10.96 分**，智能体能力平均提升 **↑6.96 分**。官方增益图如下：
 
-![图片展示了RL + OPD带来的分数增益情况，分为推理与通用能力（Reasoning & General Capabilities）和智能体能力（Agent Capabilities）两部分。其中，推理与通用能力部分以蓝色条形图呈现，标注了增益分数；智能体能力部分以紫色条形图呈现，同样标注了增益分数。该图与上下文紧密相关，直观呈现了官方公布的增益数字，即在特定基准上，RL + OPD使推理与通用能力平均提升↑10.96分，智能体能力平均提升↑6.96分。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--4.png)
+![图片展示了RL + OPD带来的分数增益情况，分为推理与通用能力（Reasoning & General Capabilities）和智能体能力（Agent Capabilities）两部分。其中，推理与通用能力部分以蓝色条形图呈现，标注了增益分数；智能体能力部分以紫色条形图呈现，同样标注了增益分数。该图与上下文紧密相关，直观呈现了官方公布的增益数字，即在特定基准上，RL + OPD使推理与通用能力平均提升↑10.96分，智能体能力平均提升↑6.96分。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--4.webp)
 
 **图 4 · RL + OPD 带来的分数增益（来源：assets/minicpm5_2b_rl_opd_score_gains.png）**
 
@@ -216,7 +216,7 @@ UltraData-RL-2609 是 JustRL II 的训练语料，也是模型卡明说的 MiniC
 
 「全栈开源」里最能体现诚意的，是把**训练工程的骨架**也交出来。面壁同日（2026-09-07）开源了自研 RL 引擎 **Meshy**（github.com/OpenBMB/Meshy，Apache-2.0）。Meshy 的定位一句话：**面向 LLM 的、基于服务、数据驱动的异步强化学习引擎——没有中央控制器，没有 Ray**，底层基于 SGLang（推理/采样）与 torchtitan（分布式训练）。传统 RL 框架（如基于 Ray 的架构）里「driver 广播 RPC、转发每个 tensor」的中央协调模式被彻底拿掉：Inference、Rollout、Training、Teacher 都是对等的独立服务，彼此通过一个 TransferQueue（传输队列）交互——队列里的三条通道 Samples（样本）、Gate（门控信号）、GPU token（GPU 所有权令牌）同时承担数据面与控制面，「列就绪（column readiness）」是唯一的控制信号，服务之间不直接握手。训练节奏（同步 on-policy / 有界 off-policy / 全异步）只是同一个框架上的一个旋钮：通过调整 rollout 的 pacing window 切换，没有独立的同步/异步代码路径。官方架构图如下：
 
-![这张图是Meshy架构图，展示了该RL框架的核心交互架构。架构以SPMD Ignitor作为顶层协调者，架构内包含Rollout Service、Inference Service、Training Service、Teacher Service四类对等的独立服务，每类服务内均有TQWorker，分别对应不同的引擎组件。这些服务间通过TransferQueue进行交互，队列设有Samples、Gate、GPU token三条通道，同时承载数据面与控制面功能。图中用不同颜色的线条区分了samples、gate信号、GPU token、权重、HTTP等各类交互信号，还标注了列就绪（readiness）作为唯一控制信号，无需服务间直接握手，实现了传统RL框架中央协调模式的革新。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--5.png)
+![这张图是Meshy架构图，展示了该RL框架的核心交互架构。架构以SPMD Ignitor作为顶层协调者，架构内包含Rollout Service、Inference Service、Training Service、Teacher Service四类对等的独立服务，每类服务内均有TQWorker，分别对应不同的引擎组件。这些服务间通过TransferQueue进行交互，队列设有Samples、Gate、GPU token三条通道，同时承载数据面与控制面功能。图中用不同颜色的线条区分了samples、gate信号、GPU token、权重、HTTP等各类交互信号，还标注了列就绪（readiness）作为唯一控制信号，无需服务间直接握手，实现了传统RL框架中央协调模式的革新。](/images/tech-report/minicpm5-2b-deep-dive/MiniCPM5-2B-深度调研-2B--5.webp)
 
 **图 5 · Meshy 架构图（来源：OpenBMB/Meshy 仓库 assets/architecture.png）**
 

@@ -55,9 +55,9 @@ OPD通过KL散度让学生无条件匹配教师的token级分布。这看起来�
 
 论文实验显示OPD+RL混合策略在训练后期仍然出现性能下降。原因：OPD收敛太快，迅速把学生锁死在KL诱导的局部最优附近，使得RL信号难以驱动后续改进。就像两个人一起跑步，跑得快的那个（OPD）很快到达终点就停下了，但那个位置不是最优的；跑得慢的那个（RL）还在继续探索更好的位置，但被快的那个拖住了。
 
-![Figure 2（左）: Qwen3-4B（族内）上 OPD/RL/OPD+RL 的训练动态。OPD 初期快但很快饱和，RL 慢但稳，OPD+RL 并未带来额外增益。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-1.png)
+![Figure 2（左）: Qwen3-4B（族内）上 OPD/RL/OPD+RL 的训练动态。OPD 初期快但很快饱和，RL 慢但稳，OPD+RL 并未带来额外增益。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-1.webp)
 
-![Figure 2（右）: DSQW-1.5B（跨族）上的训练动态。跨族时 OPD 甚至不如 RL，说明 KL 模仿在分布差异大时确实有害。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-2.png)
+![Figure 2（右）: DSQW-1.5B（跨族）上的训练动态。跨族时 OPD 甚至不如 RL，说明 KL 模仿在分布差异大时确实有害。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-2.webp)
 
 ---
 
@@ -81,7 +81,7 @@ OPD通过KL散度让学生无条件匹配教师的token级分布。这看起来�
 
 > 这两个观察共同指向一个结论：**教师监督不应作为独立的无条件模仿损失，而应与RL目标结合，只在"做对"的轨迹上提供细粒度指导**。这就是Distilled RL的核心思想。
 
-![Figure 3: 增大 Rollout 组大小（G=1,4,8）并未给 OPD 带来可靠或持续的增益，说明 OPD 的瓶颈在于 KL 模仿目标本身，而非采样方差。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-3.png)
+![Figure 3: 增大 Rollout 组大小（G=1,4,8）并未给 OPD 带来可靠或持续的增益，说明 OPD 的瓶颈在于 KL 模仿目标本身，而非采样方差。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-3.webp)
 
 ---
 
@@ -202,9 +202,9 @@ Distilled RL在知识密集型基准上同样表现最佳（SuperGPQA 22.20%）�
 
 AIME24上从60.0%（RL）飙到70.0%（+10pp），说明Distilled RL不仅提升了最高概率响应的质量，还改善了整体响应分布。
 
-![Figure 5（左）: Qwen3-4B 训练曲线对比。Distilled RL 在奖励、策略熵、响应长度和 Pass@1 四个维度上均表现最优——奖励最高、熵稳定、长度稳定、Pass@1 持续提升。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-4.png)
+![Figure 5（左）: Qwen3-4B 训练曲线对比。Distilled RL 在奖励、策略熵、响应长度和 Pass@1 四个维度上均表现最优——奖励最高、熵稳定、长度稳定、Pass@1 持续提升。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-4.webp)
 
-![Figure 5（右）: DSQW-1.5B 训练曲线对比。跨族蒸馏场景下 Distilled RL 优势更加明显，OPD 甚至出现性能下降。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-5.png)
+![Figure 5（右）: DSQW-1.5B 训练曲线对比。跨族蒸馏场景下 Distilled RL 优势更加明显，OPD 甚至出现性能下降。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-5.webp)
 
 ### 4.5 消融实验
 
@@ -216,7 +216,7 @@ AIME24上从60.0%（RL）飙到70.0%（+10pp），说明Distilled RL不仅提升
 
 > **负样本重置是绝对核心**——移除后平均掉6-9分。几何归一化也有贡献但较小（掉1-1.5分）。这验证了"在错误轨迹上不要模仿教师"是最关键的设计决策。
 
-![Figure 6: 移除负样本重置后，学生策略的熵无法跟随目标阈值（红色虚线），持续低于目标。证明对负轨迹应用教师指导会抑制知识迁移。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-6.png)
+![Figure 6: 移除负样本重置后，学生策略的熵无法跟随目标阈值（红色虚线），持续低于目标。证明对负轨迹应用教师指导会抑制知识迁移。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-6.webp)
 
 ### 4.6 可解释案例：熵控制
 
@@ -229,7 +229,7 @@ AIME24上从60.0%（RL）飙到70.0%（+10pp），说明Distilled RL不仅提升
 
 > 这个实验的意义重大：它证明了Distilled RL能传递**超越原始RL奖励信号**的教师信息。标准RL只看对错（0/1奖励），但教师可以通过Distilled RL传递"应该怎么错"（分布形状、熵水平）这种更丰富的信号。这是纯RL做不到的。
 
-![Figure 4: 熵控制实验——Distilled RL 学生的策略熵（蓝线）能快速跟随教师设定的目标阈值（红色虚线），证明 Distilled RL 能传递超越 0/1 奖励的教师信息（如分布熵）。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-7.png)
+![Figure 4: 熵控制实验——Distilled RL 学生的策略熵（蓝线）能快速跟随教师设定的目标阈值（红色虚线），证明 Distilled RL 能传递超越 0/1 奖励的教师信息（如分布熵）。](/images/paper-reading/2026-08-06-distilled-rl/2026-08-06-d09-7.webp)
 
 ---
 

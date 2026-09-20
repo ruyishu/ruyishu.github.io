@@ -22,7 +22,7 @@ pubDate: '2026-09-03'
 
 *官方 Figure 1：Pass@1（横轴 = 训练步数；蓝 = Qwen3.6-35B-A3B，橙 = Qwen3.5-397B-A17B；灰色虚线 = 无步数轴的参考模型：Grok 4.5 High 29.4% / Post-trained GLM-4.7 355B 23.0% / Opus 4.5 High 20.7%）*
 
-![Figure 2：按领域分组的 base vs post-trained Pass@1](/images/misc/agent-rl-retro/agent-rl-复盘-2.png)
+![Figure 2：按领域分组的 base vs post-trained Pass@1](/images/misc/agent-rl-retro/agent-rl-复盘-2.webp)
 
 *官方 Figure 2：按领域（Law / Consulting / IB）的 base vs post-trained Pass@1。35B：Law 12.9→23.7、Consulting 13.3→18.5、IB 15.6→25.8；397B：Law 18.8→25.0、Consulting 12.9→27.7、IB 16.7→29.2（浅色 = base，深色 = post-trained）*
 
@@ -139,7 +139,7 @@ Step 6  评估与泛化                     → APEX / Terminal-Bench / GPQA / H
 - 推理与训练**分离**：vLLM 做推理引擎，Megatron 做训练后端，训练中通过 **NCCL in-flight 权重同步**把新权重实时同步给推理引擎（全异步训练的前提）。
 - 每个 rollout trial 是一个独立的 Ray task；Harbor 管理生命周期：`env start → agent.run() → verify → teardown`。
 
-![Figure 3：一次 RL trial 中各组件的分布（架构图）](/images/misc/agent-rl-retro/agent-rl-复盘-3.png)
+![Figure 3：一次 RL trial 中各组件的分布（架构图）](/images/misc/agent-rl-retro/agent-rl-复盘-3.webp)
 
 *官方 Figure 3："What runs where" —— 一次 RL trial：左 = HF 数据集里的 Harbor 任务目录；中 = Ray GPU 集群上的 SkyRL（全异步训练循环、vLLM 引擎、in-flight NCCL 权重同步），每个 trial 一个 Ray task；右 = 每个 trial 的 Modal 沙箱（从 ECR 镜像启动、暴露 MCP 服务器、agent 结束后在沙箱内跑 verifier）*
 
@@ -156,7 +156,7 @@ Step 6  评估与泛化                     → APEX / Terminal-Bench / GPQA / H
    - 实际由系统上限决定：35B 并发 **550**、397B 并发 **300**，都远低于 1024。
 4. **train-inference 一致性校验**：跑几步后比较 trainer 与推理引擎的 logprob，**均值差 < 0.03 通常健康**。这一步真的抓到了 bug：vLLM CPU offloading + GDN 模型 + in-flight 权重更新组合下的正确性问题。
 
-![Figure 4：trainer 与推理引擎的 logprob 差异](/images/misc/agent-rl-retro/agent-rl-复盘-4.png)
+![Figure 4：trainer 与推理引擎的 logprob 差异](/images/misc/agent-rl-retro/agent-rl-复盘-4.webp)
 
 *官方 Figure 4：trainer 与推理引擎的 mean logprob 差，低于 0.03 通常是健康信号*
 
@@ -180,7 +180,7 @@ Step 6  评估与泛化                     → APEX / Terminal-Bench / GPQA / H
 
 **重要发现**：靠**文件 diff** 评分的任务比只评最终回复的任务**难学得多**；排查发现是评分逻辑的问题 —— 改用第三方文件 diff 工具后提取保真度提升，任务立刻变得可学习。这一条对任何做"带产物 agent"评测的人都通用。
 
-![Figure 5：32 任务过拟合运行的 reward 曲线](/images/misc/agent-rl-retro/agent-rl-复盘-5.png)
+![Figure 5：32 任务过拟合运行的 reward 曲线](/images/misc/agent-rl-retro/agent-rl-复盘-5.webp)
 
 *官方 Figure 5：32 任务上的过拟合运行 —— 几步之内就该看到学习信号*
 
@@ -211,7 +211,7 @@ Step 6  评估与泛化                     → APEX / Terminal-Bench / GPQA / H
 
 **官方 Table 1 原图**（含 3 次 pass 各自的 context 超限计数列，比上表多一列信息）：
 
-![官方 Table 1：算法消融全表](/images/misc/agent-rl-retro/agent-rl-复盘-6.png)
+![官方 Table 1：算法消融全表](/images/misc/agent-rl-retro/agent-rl-复盘-6.webp)
 
 > 口径提醒：官方几处"base"数字并不完全一致——Step 1 说修好 harness 后**未训练模型**在最终 harness 上是 28.69%（该值与 Table 2 的 35B base 行一致）；而本消融表末尾的 `Untrained` 行是 22.74%（对应早期未修 harness 的 22.74% 口径）。官方没有专门解释这个差异，**各表内部做相对比较即可，不要跨表拼绝对值**。
 
@@ -337,7 +337,7 @@ bash scripts/run_1gpu_colocated_smoke.sh   # 默认 Qwen3.5-0.8B，2×2 batch，
 
 ![官方 Table 2：Archipelago vs OpenCode 双 harness 结果](/images/misc/agent-rl-retro/agent-rl-复盘-7.png)
 
-![Figure 6：工具调用中代码执行 vs MCP 的占比曲线](/images/misc/agent-rl-retro/agent-rl-复盘-8.png)
+![Figure 6：工具调用中代码执行 vs MCP 的占比曲线](/images/misc/agent-rl-retro/agent-rl-复盘-8.webp)
 
 *官方 Figure 6：工具调用里代码执行（vs MCP）的占比 —— Qwen3.6-35B-A3B 训练中越来越依赖代码执行，Qwen3.5-397B-A17B 始终偏爱 MCP*
 
@@ -355,7 +355,7 @@ bash scripts/run_1gpu_colocated_smoke.sh   # 默认 Qwen3.5-0.8B，2×2 batch，
 | Qwen3.5-397B-A17B | 50.56% ± 2.66 | — |
 | Qwen3.5-397B-A17B-Mercor | 55.43% ± 2.83 | +4.87 pt |
 
-![官方 Table 3：Terminal-Bench 2.1 前后对比](/images/misc/agent-rl-retro/agent-rl-复盘-9.png)
+![官方 Table 3：Terminal-Bench 2.1 前后对比](/images/misc/agent-rl-retro/agent-rl-复盘-9.webp)
 
 - 换了数据集又换了 harness，增益依然在（35B +6.37 pt、397B +4.87 pt）：学到的是可迁移的 agentic 能力而非任务记忆；小模型依旧迁移更强，与其偏好代码执行一致。
 
@@ -374,21 +374,21 @@ bash scripts/run_1gpu_colocated_smoke.sh   # 默认 Qwen3.5-0.8B，2×2 batch，
 | Qwen3.5-397B-A17B-Mercor | 29.72% ± 0.18 | 88.55% ± 1.27 |
 | Difference | +0.79 pt | +1.01 pt |
 
-![官方 Table 4：HLE 与 GPQA 前后对比](/images/misc/agent-rl-retro/agent-rl-复盘-10.png)
+![官方 Table 4：HLE 与 GPQA 前后对比](/images/misc/agent-rl-retro/agent-rl-复盘-10.webp)
 
 ### 9.4 学习曲线形态（防误读）
 
 - 两个规模的 Pass@1 / Pass@16 在**早期都先下降再上升**。官方解释：异步 RL 的动力学 —— 较容易的任务先被完成并吃到梯度，难度上升导致均分先掉。看到曲线先跌别慌。
 
-![Pass@1 学习曲线（reward/avg_perfect_mean_at_1）](/images/misc/agent-rl-retro/agent-rl-复盘-11.png)
+![Pass@1 学习曲线（reward/avg_perfect_mean_at_1）](/images/misc/agent-rl-retro/agent-rl-复盘-11.webp)
 
 *官方曲线 1：reward/avg_perfect_mean_at_1（正文所说的 Pass@1 曲线）*
 
-![Pass@16 学习曲线（reward/avg_perfect_at_16）](/images/misc/agent-rl-retro/agent-rl-复盘-12.png)
+![Pass@16 学习曲线（reward/avg_perfect_at_16）](/images/misc/agent-rl-retro/agent-rl-复盘-12.webp)
 
 *官方曲线 2：reward/avg_perfect_at_16（正文所说的 Pass@16 曲线）*
 
-![policy entropy 学习曲线](/images/misc/agent-rl-retro/agent-rl-复盘-13.png)
+![policy entropy 学习曲线](/images/misc/agent-rl-retro/agent-rl-复盘-13.webp)
 
 *官方曲线 3：policy/policy_entropy。三张图均为蓝色 = 35B run、橙色 = 397B run，曲线早期都先降后升 —— 异步 RL 下较简单任务先完成所致（图中指标名为 W&B 面板原始名称）*
 

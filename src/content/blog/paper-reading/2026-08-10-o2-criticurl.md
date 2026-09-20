@@ -31,7 +31,7 @@ pubDate: '2026-08-10'
 
 ## 一、先看一个真实例子：答案对了，推理对了吗？
 
-![Figure 1: 不同模型在数学推理问题上的表现对比。O²-CritiCuRL在多个基准上取得最优。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-1.png)
+![Figure 1: 不同模型在数学推理问题上的表现对比。O²-CritiCuRL在多个基准上取得最优。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-1.webp)
 
 上图展示了不同模型在多个数学推理基准上的表现。O²-CritiCuRL（7B）在MathVista、MathVision、ChartQA、MMMU、MMStar等5个基准上取得SOTA，平均性能81.1%，比标准GRPO的79.1%高出2个百分点——但更重要的是，这2个百分点是"实打实的"，不是靠虚假捷径蒙来的。
 
@@ -74,7 +74,7 @@ pubDate: '2026-08-10'
 
 ## 三、方法：O²-CritiCuRL的离在线闭环设计
 
-![Figure 2: O²-CritiCuRL框架总览。离线阶段用KL散度识别关键步骤，在线阶段用截断链策略做步骤级GRPO，两步交替迭代。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-2.png)
+![Figure 2: O²-CritiCuRL框架总览。离线阶段用KL散度识别关键步骤，在线阶段用截断链策略做步骤级GRPO，两步交替迭代。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-2.webp)
 
 > O² = Offline-Online。核心思想：**不是所有推理步骤都同等重要——自动识别关键步骤，让RL聚焦在这些步骤上做优化，然后离在线迭代形成闭环。**
 
@@ -119,13 +119,13 @@ $$S_i = \alpha \cdot R_a + \beta \cdot R_f + \gamma \cdot (R_t + R_s)$$
 - `R_s`：**步骤准确性奖励**——直接奖励关键步骤的推理正确性
 - `α, β, γ`：平衡权重（实验表明对权重不敏感，波动约0.2%）
 
-![Figure 3: 步骤级奖励与答案级奖励的训练曲线对比。步骤级奖励能更稳定地引导模型学习。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-3.png)
+![Figure 3: 步骤级奖励与答案级奖励的训练曲线对比。步骤级奖励能更稳定地引导模型学习。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-3.webp)
 
 ### 3.3 离在线迭代闭环
 
 > **关键创新**：不只是一次性离线识别关键步骤，而是离在线交替进行。每轮在线RL后，用更新后的模型重新执行离线阶段，识别出与当前模型能力更匹配的新关键步骤。这个闭环持续到奖励信号稳定。
 
-![Figure 4: 关键步骤在迭代过程中的迁移。随着模型能力提升，被识别为关键的步骤也在变化——说明课程难度与模型能力同步演进。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-4.png)
+![Figure 4: 关键步骤在迭代过程中的迁移。随着模型能力提升，被识别为关键的步骤也在变化——说明课程难度与模型能力同步演进。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-4.webp)
 
 上图展示了一个非常重要的现象：**关键步骤不是固定的，而是随着模型能力的提升在迁移**。初期模型可能只需要关注简单的计算步骤，后期则需要聚焦更复杂的推理节点。这正是课程学习的精髓——让训练难度与模型能力同步增长。
 
@@ -156,11 +156,11 @@ O²-CritiCuRL在多个基准上的奖励黑客率均低于Vision-R1和R1-Onevisi
 
 ### 4.3 Case Study：三个真实推理场景
 
-![Figure 5: ScienceQA上的Case Study。对比Vision-R1、R1-VL和O²-CritiCuRL的推理行为。O²-CritiCuRL的推理链更聚焦关键步骤，避免了虚假捷径。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-5.png)
+![Figure 5: ScienceQA上的Case Study。对比Vision-R1、R1-VL和O²-CritiCuRL的推理行为。O²-CritiCuRL的推理链更聚焦关键步骤，避免了虚假捷径。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-5.webp)
 
-![Figure 6: MMStar上的Case Study。O²-CritiCuRL在关键推理节点上表现更稳定，减少了中间步骤的错误。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-6.png)
+![Figure 6: MMStar上的Case Study。O²-CritiCuRL在关键推理节点上表现更稳定，减少了中间步骤的错误。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-6.webp)
 
-![Figure 7: ChartQA上的Case Study。O²-CritiCuRL能更准确地从图表中提取关键信息，避免了基于语言先验的幻觉。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-7.png)
+![Figure 7: ChartQA上的Case Study。O²-CritiCuRL能更准确地从图表中提取关键信息，避免了基于语言先验的幻觉。](/images/paper-reading/2026-08-10-o2-criticurl/2026-08-10-d11-7.webp)
 
 从三个Case Study中可以清晰看到：
 

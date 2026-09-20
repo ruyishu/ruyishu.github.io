@@ -36,7 +36,7 @@ pubDate: '2026-09-02'
 
 > **场景**：一个行人站在路口，你要预测 3 秒后他在哪。**判别式世界模型（DINO-world）**：直接给一个"最可能的答案"——但如果行人 30% 可能往左、30% 往右、40% 停住，模型只能给"平均值"：一个站在中间的模糊影子，**哪个都不是真的**。**老式生成式世界模型（Cosmos）**：能出多种可能（往左/往右/停住），但每种都要扩散去噪几十步或自回归几千个 token——**出一个未来都贵，出 20 个未来贵上天**。**DeltaWorld（今天）**：每帧只用一个"变化 token"（这一帧比上一帧变了啥），一次前向同时生成 K 个未来（每个对应一个"行人往左/往右/停住"的假设），**只挑最像真值的那一个来学**——便宜，而且预测的多样性是真的。
 
-![图片展示了现有生成世界模型与DeltaWorld的工作流程对比。上方为现有生成世界模型，用大模型进行多次前向运算，每帧需许多空间token；下方为DeltaWorld，用小模型一次前向运算，每帧仅需一个delta token。该图与上下文紧密相关，直观呈现了DeltaWorld只预测“变化”的核心思想，即每帧只用一个“变化token”，不预测“下一帧长什么样”，与上下文对DeltaWorld工作原理的阐述相呼应。](/images/paper-reading/2026-09-02-deltaworld/2026-09-02-d29-1.png)
+![图片展示了现有生成世界模型与DeltaWorld的工作流程对比。上方为现有生成世界模型，用大模型进行多次前向运算，每帧需许多空间token；下方为DeltaWorld，用小模型一次前向运算，每帧仅需一个delta token。该图与上下文紧密相关，直观呈现了DeltaWorld只预测“变化”的核心思想，即每帧只用一个“变化token”，不预测“下一帧长什么样”，与上下文对DeltaWorld工作原理的阐述相呼应。](/images/paper-reading/2026-09-02-deltaworld/2026-09-02-d29-1.webp)
 
 ## 二、动机：判别式模糊，生成式太贵
 
@@ -90,7 +90,7 @@ pubDate: '2026-09-02'
   - 序列开头补黑帧，让第一个 delta token 编码绝对特征
   - 训练：BoM 在 delta token 空间选最优，**无需解码**；推理：K 个噪声 query 一次前向出 K 个多样未来；自回归 rollout 全在 delta token 空间，解码器最后统一还原
 
-![图片展示了DeltaTok+DeltaWorld方法的训练与推理流程。训练时，输入三帧图像，通过VFM提取特征，经DeltaTok Encoder编码生成z_t，再通过Predictor预测下一个delta token，最后用Smooth L1 Loss计算损失，仅通过最优预测反向传播。推理时，输入两帧图像，同样经VFM和DeltaTok Encoder处理，生成z_t后，通过Predictor预测未来delta token，再经DeltaTok Decoder解码，输出多帧图像。该图直观呈现了上下文介绍的模型工作原理。](/images/paper-reading/2026-09-02-deltaworld/2026-09-02-d29-2.png)
+![图片展示了DeltaTok+DeltaWorld方法的训练与推理流程。训练时，输入三帧图像，通过VFM提取特征，经DeltaTok Encoder编码生成z_t，再通过Predictor预测下一个delta token，最后用Smooth L1 Loss计算损失，仅通过最优预测反向传播。推理时，输入两帧图像，同样经VFM和DeltaTok Encoder处理，生成z_t后，通过Predictor预测未来delta token，再经DeltaTok Decoder解码，输出多帧图像。该图直观呈现了上下文介绍的模型工作原理。](/images/paper-reading/2026-09-02-deltaworld/2026-09-02-d29-2.webp)
 
 > **三个观察**：① **"预测变化"比"预测完整"便宜且更准**——静态背景不用重画，模型算力全花在真正动的东西上（Table 2：Delta 压缩 0.5× 开销 + 精度反超帧压缩）；② **BoM 是"免费"的生成机制**——K 个 query 对应 K 个未来，只监督最优，不需要扩散/归一化流；③ **判别式的确定性 vs 生成式的多样性，被 BoM 一刀切开**——best（至少有一个准）和 mean（整体一致）两个指标都强，说明多样性不是噪声。
 

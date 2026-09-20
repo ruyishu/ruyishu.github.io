@@ -36,7 +36,7 @@ pubDate: '2026-09-10'
 
 > **场景**：让模型预测"打开抽屉后，画面会变成什么样"。**MLE 训练会发生什么**：模型学会"让下一个 token 的概率最高"——但**我们真正在乎的不是每个 token 的概率，而是解码出来的那几帧画面像不像真实未来**。这两个目标并不一致：一个 token 的似然提升，可能对最终画面的感知质量（LPIPS/SSIM）毫无贡献，甚至有害。**另一个典型病**：视频世界模型在 MLE 下会**重复**——预测出来的帧卡住不动（重复率 48.6%）——因为"复现最可能的下一帧"退化成"抄上一帧"最省事。**RLVR-World 的做法**：把"解码后的预测"拿去和真值比，**直接拿任务指标当奖励**（LPIPS 好=奖励高、F1 高=奖励高），用 GRPO 优化——训练目标和使用目标第一次对齐了。
 
-![这张图是论文的Figure 1，展示了世界模型训练的代理目标（MLE）与直接优化（RLVR）的对比内容。左侧是对应预训练阶段的内容，标注有“可扩展但只是代理目标”，其世界模型训练环节包含状态s、动作a、状态s'，下方明确标注该方式具备可扩展性，属于代理优化；右侧是对应SFT及RL阶段的内容，标注有“任务对齐但计算重”，世界模型训练环节也包含状态s、动作a，生成对应样本，下方明确标注该方式具备任务对齐性，但存在计算繁重的问题，整体用于说明世界模型训练的两种不同路径的特点。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-1.png)
+![这张图是论文的Figure 1，展示了世界模型训练的代理目标（MLE）与直接优化（RLVR）的对比内容。左侧是对应预训练阶段的内容，标注有“可扩展但只是代理目标”，其世界模型训练环节包含状态s、动作a、状态s'，下方明确标注该方式具备可扩展性，属于代理优化；右侧是对应SFT及RL阶段的内容，标注有“任务对齐但计算重”，世界模型训练环节也包含状态s、动作a，生成对应样本，下方明确标注该方式具备任务对齐性，但存在计算繁重的问题，整体用于说明世界模型训练的两种不同路径的特点。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-1.webp)
 
 ▲ 论文 Figure 1：代理目标（MLE）vs 直接优化（RLVR）——左侧"可扩展但只是代理目标"，右侧"任务对齐但计算重"
 
@@ -61,7 +61,7 @@ pubDate: '2026-09-10'
 
 ## 三、方法：把世界模型统一成序列，用指标当奖励
 
-![图片展示了RLVR-World框架中语言世界模型和视频世界模型的结构。语言世界模型通过BPE分词、Tokenization、Language World Model、GRPO等步骤，最终得到可验证奖励（Accuracy/F1 score等）；视频世界模型则由Visual Encoder量化、Visual Decoder解码、GRPO等环节构成，产出MSE/LPIPS/SSIM等可验证奖励。该图与上下文紧密相关，直观呈现了论文中提到的统一各模态、用decoder-only Transformer的next-token prediction进行序列建模的方法。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-2.png)
+![图片展示了RLVR-World框架中语言世界模型和视频世界模型的结构。语言世界模型通过BPE分词、Tokenization、Language World Model、GRPO等步骤，最终得到可验证奖励（Accuracy/F1 score等）；视频世界模型则由Visual Encoder量化、Visual Decoder解码、GRPO等环节构成，产出MSE/LPIPS/SSIM等可验证奖励。该图与上下文紧密相关，直观呈现了论文中提到的统一各模态、用decoder-only Transformer的next-token prediction进行序列建模的方法。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-2.webp)
 
 ▲ 论文 Figure 2：RLVR-World 框架——(a) 语言世界模型（BPE → GRPO → Accuracy/F1 奖励）(b) 视频世界模型（visual tokenizer → GRPO → MSE/LPIPS/SSIM 奖励）
 
@@ -137,7 +137,7 @@ pubDate: '2026-09-10'
 - **多步预测是主战场**：Base 的重复率 48.6%（预测帧卡住不动）→ RLVR 降到 9.9%；再加"重复惩罚奖励"可到 **0.0%**
 - 有意思的对照：给 Base **加去重后处理**也能消掉重复，但 MSE/LPIPS 只小改善（0.593/14.4）——**后处理治表面，RLVR 治本质**（0.486/13.4）
 
-![这张图展示了两个折线图，分别对比不同训练方式的LPIPS指标变化。左侧图表横轴是训练步数（前半段为10^4级，后半段为真实步数），纵轴为LPIPS值，蓝色折线代表MLE训练，橙色折线代表RLVR训练，在两个训练阶段衔接点，RLVR的LPIPS出现明显下降并稳定在较低水平。右侧图表延续了这类对比，同样以LPIPS为纵轴，蓝色折线为MLE训练，橙色折线为RLVR训练，显示RLVR训练后LPIPS指标进一步降低，且标注有预训练扩展至600k步的相关内容。这类数据是实验中评估视频世界模型训练效果的直观呈现，对应了文档中关于RLVR训练提升模型表现的结论。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-3.png)
+![这张图展示了两个折线图，分别对比不同训练方式的LPIPS指标变化。左侧图表横轴是训练步数（前半段为10^4级，后半段为真实步数），纵轴为LPIPS值，蓝色折线代表MLE训练，橙色折线代表RLVR训练，在两个训练阶段衔接点，RLVR的LPIPS出现明显下降并稳定在较低水平。右侧图表延续了这类对比，同样以LPIPS为纵轴，蓝色折线为MLE训练，橙色折线为RLVR训练，显示RLVR训练后LPIPS指标进一步降低，且标注有预训练扩展至600k步的相关内容。这类数据是实验中评估视频世界模型训练效果的直观呈现，对应了文档中关于RLVR训练提升模型表现的结论。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-3.webp)
 
 ▲ 论文 Figure 3：RT-1 学习曲线——左为 MLE 预训练（横轴 ×10⁴ 步）、右为 RLVR 后训练（横轴 ×1 步），量级差 4 个数量级
 
@@ -149,7 +149,7 @@ pubDate: '2026-09-10'
 - 对比手工仿真器 SIMPLER（VA/VM 两个变体）：**世界模型的"真实-仿真成功率差"更小**（曲线更贴近 y=x 对角线），RLVR 版进一步优于 Base
 - 这就是"世界模型当仿真器"的实用价值：**评估的成本从真机转移到模型，而 RLVR 让这个替代品更可信**
 
-![这张图是论文Figure 5，展示了Open Drawer和Close Drawer两类任务的Real2Sim策略评估结果，用来对比真实环境与仿真环境的策略成功率对齐情况。横轴为真实成功率，纵轴为仿真成功率，对角线代表真实与仿真成功率完全一致的基准线。图中包含SIMPLER-VA、SIMPLER-VM、Base Model、RLVR-World四条曲线，其中RLVR-World的曲线最贴近对角线，说明其真实-仿真成功率差最小，表现优于SIMPLER的两个变体和Base Model，直观体现了RLVR优化后的世界模型作为仿真器的评估可信度。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-4.png)
+![这张图是论文Figure 5，展示了Open Drawer和Close Drawer两类任务的Real2Sim策略评估结果，用来对比真实环境与仿真环境的策略成功率对齐情况。横轴为真实成功率，纵轴为仿真成功率，对角线代表真实与仿真成功率完全一致的基准线。图中包含SIMPLER-VA、SIMPLER-VM、Base Model、RLVR-World四条曲线，其中RLVR-World的曲线最贴近对角线，说明其真实-仿真成功率差最小，表现优于SIMPLER的两个变体和Base Model，直观体现了RLVR优化后的世界模型作为仿真器的评估可信度。](/images/paper-reading/2026-09-10-rlvr-world/2026-09-10-d35-4.webp)
 
 ▲ 论文 Figure 5：Real2Sim 策略评估——Open/Close Drawer 上世界模型 vs SIMPLER 模拟器的真实-仿真成功率对齐（越贴对角线越准）
 
