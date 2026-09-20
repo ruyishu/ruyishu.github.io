@@ -324,75 +324,18 @@ const posts = (await getCollection('blog')).sort(
 					</p>
 
 					<p class="bio-paragraph" style="font-size: 0.92rem; color: var(--color-text-dim);">
-						你可以浏览我的 <a href="#projects">精选项目</a>，或者查看全部 <a href="/blog">技术博客文章</a>。欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 或邮件 <a href="mailto:kunzhang19970209@gmail.com" style="font-family: var(--font-mono); color: var(--color-text-main);">kunzhang19970209@gmail.com</a> 交流。
+						你可以浏览我的 <a href="/blog">技术博客文章</a>，或者查看 <a href="/about">关于我</a>。欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 或邮件 <a href="mailto:kunzhang19970209@gmail.com" style="font-family: var(--font-mono); color: var(--color-text-main);">kunzhang19970209@gmail.com</a> 交流。
 					</p>
 				</section>
 
-				<!-- 标志性大字切换 Tabs (Projects · Blog · Workbench · About) -->
+				<!-- 大字切换 Tabs (Posts · About) -->
 				<nav class="subnav-tabs" aria-label="Page Sections">
-					<a href="#projects" class="subnav-tab active">Projects</a>
-					<a href="/blog" class="subnav-tab">Blog</a>
-					<a href="/workbench" class="subnav-tab">Workbench</a>
+					<a href="/blog" class="subnav-tab active">Posts</a>
 					<a href="/about" class="subnav-tab">About</a>
 				</nav>
 
-				<!-- 核心板块 2: 精选项目 (遵循 pseudoyu.com/projects 现代网格卡片) -->
-				<section id="projects" style="scroll-margin-top: 5rem; margin-top: 3.5rem;">
-					<div class="watermark-container">
-						<span class="watermark-text">Projects</span>
-						<h2 class="section-anchor">Featured Projects</h2>
-					</div>
-
-					<div class="projects-grid">
-						<a href="/workbench#projects" class="project-item">
-							<div class="project-header">
-								<span class="project-name">FastInfer-Engine</span>
-								<span class="tag-pill tag-pill-highlight">C++20 / CUDA</span>
-							</div>
-							<p class="project-desc">
-								面向大语言模型的高吞吐自研推理运行时，支持 FlashAttention 算子融合与虚拟分页 KV-Cache 内存池管理。
-							</p>
-							<div class="project-tags">
-								<span class="tag-pill">P99 &lt; 8.2ms</span>
-								<span class="tag-pill">TensorRT-LLM</span>
-								<span class="tag-pill">FusedKernel</span>
-							</div>
-						</a>
-
-						<a href="/workbench#projects" class="project-item">
-							<div class="project-header">
-								<span class="project-name">DistFlow-Scheduler</span>
-								<span class="tag-pill tag-pill-highlight">Python / PyTorch</span>
-							</div>
-							<p class="project-desc">
-								异构 GPU 集群分布式训练拓扑编排器。利用梯度通信与前向流水线智能重叠，压榨跨机 NVLink 带宽。
-							</p>
-							<div class="project-tags">
-								<span class="tag-pill">Speedup 1.34x</span>
-								<span class="tag-pill">NCCL</span>
-								<span class="tag-pill">FaultTolerance</span>
-							</div>
-						</a>
-
-						<a href="/workbench#projects" class="project-item">
-							<div class="project-header">
-								<span class="project-name">ruyishu.github.io</span>
-								<span class="tag-pill tag-pill-highlight">Astro 7 / TS</span>
-							</div>
-							<p class="project-desc">
-								当前静态技术博客与个人工作台，极简排版、零框架臃肿、双 Shiki 代码高亮与可收缩侧边栏。
-							</p>
-							<div class="project-tags">
-								<span class="tag-pill">Pure Static</span>
-								<span class="tag-pill">Zero-JS Main</span>
-								<span class="tag-pill">Dark Mode</span>
-							</div>
-						</a>
-					</div>
-				</section>
-
-				<!-- 核心板块 3: 最新撰写的博客文章 (pseudoyu 风格时间线列表) -->
-				<section style="margin-top: 3.5rem;">
+				<!-- 最新博客文章 -->
+				<section style="margin-top: 1.5rem;">
 					<div class="watermark-container">
 						<span class="watermark-text">Posts</span>
 						<h2 class="section-anchor">Recent Posts</h2>
@@ -413,19 +356,12 @@ const posts = (await getCollection('blog')).sort(
 						}
 					</ul>
 
-					<div style="margin-top: 1rem;">
+					<div style="margin-top: 1.25rem;">
 						<a href="/blog" style="font-size: 0.9rem; font-family: var(--font-mono); color: var(--color-accent);">
 							查看全部文章归档 →
 						</a>
 					</div>
 				</section>
-
-				<!-- pseudoyu 风格的终端引导跳转 (cd ./workbench) -->
-				<div class="terminal-cd-jump">
-					<span style="opacity: 0.5;">&gt;</span>
-					<span>进入博主专属控制台：</span>
-					<a href="/workbench" class="terminal-cd-link">cd ./workbench</a>
-				</div>
 			</div>
 		</main>
 		<Footer />
