@@ -11,9 +11,11 @@ export const WORKBENCH_PUBLIC_DEFAULT = false;
 
 // 博客分类：一个分类 = src/content/blog/<slug>/ 一个文件夹 + 侧边栏一个子项。
 // 新增分类只需在这里加一条，再把文章放进同名文件夹，侧边栏与归档页会自动跟上。
+// 注：热门论文＝追踪值得关注的论文；论文阅读＝自己读过并做了笔记的论文，两者不要混。
 export const BLOG_CATEGORIES = [
 	{ slug: 'tech-report', label: '技术报告' },
-	{ slug: 'papers', label: '热门论文' },
+	{ slug: 'hot-papers', label: '热门论文' },
+	{ slug: 'paper-reading', label: '论文阅读' },
 	{ slug: 'trends', label: '前沿热点' },
 	{ slug: 'misc', label: '杂项' },
 ] as const;
