@@ -1,5 +1,5 @@
 ---
-title: '0902 DeltaWorld：一帧一个 token：只预测＂变化＂的世界模型，参数省 35×、算力省 2000×'
+title: '0902 DeltaWorld：一帧一个 token'
 description: '视频世界模型都太重了——每帧要预测几千个空间 token（或扩散多步去噪）；DeltaWorld 把"相邻两帧之间的变化"压成单个 delta token\*\*，让世界模型只预测…'
 pubDate: '2026-09-02'
 ---

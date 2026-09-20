@@ -1,5 +1,5 @@
 ---
-title: '0918 MindJourney：给 VLM 外挂一个世界模型：不训练也能涨 7.7% 空间推理，NeurIPS 2025'
+title: '0918 MindJourney：给 VLM 外挂一个世界模型'
 description: 'VLM 看不懂三维——给它一张室内照片问"我如果坐在右侧沙发上、面朝椅子，厨房在我左边还是右边？"，它经常答错，因为它只有 2D 感知、脑子里没有 3D 动力学。MindJourn…'
 pubDate: '2026-09-18'
 ---

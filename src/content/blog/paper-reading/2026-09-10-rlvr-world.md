@@ -1,5 +1,5 @@
 ---
-title: '0910 RLVR-World：世界模型也要 RLVR 后训练：MLE 训的是＂像不像＂，RLVR 训的是＂准不准＂，NeurIPS 2025'
+title: '0910 RLVR-World：世界模型也要 RLVR 后训练'
 description: '世界模型（预测"做这个动作，世界会变成什么样"）一直用最大似然（MLE）训练——但那优化的是"像不像训练数据"，不是任务真正要的"预测得准不准、看起来真不真"；RLVR-World…'
 pubDate: '2026-09-10'
 ---

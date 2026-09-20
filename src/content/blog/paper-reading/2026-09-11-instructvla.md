@@ -1,5 +1,5 @@
 ---
-title: '0911 InstructVLA：让 VLA 既会动手又不丢脑子：MoE 双专家 + VLA-IT 指令微调，1.5B 打败 7B+GPT-4o，ICLR 2026'
+title: '0911 InstructVLA：让 VLA 既会动手又不丢脑子'
 description: 'VLA（看图→听话→动手）的老毛病是"学了动手就忘了说话"——在操作数据上微调之后，模型原本的多模态理解能力（OCR、常识、图表问答）会被冲掉，甚至掉到 0。这篇的解法是把"动手"…'
 pubDate: '2026-09-11'
 ---
