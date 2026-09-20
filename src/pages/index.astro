@@ -1,43 +1,513 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { getCollection } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+).slice(0, 4);
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			.content-wrapper {
+				max-width: 48rem;
+				margin: 0 auto;
+			}
+
+			/* Bio Section */
+			.intro-section {
+				margin-bottom: 2.5rem;
+			}
+
+			.author-name {
+				font-size: 2.5rem;
+				font-weight: 800;
+				letter-spacing: -0.03em;
+				margin: 0 0 0.5rem 0;
+			}
+
+			.author-tagline {
+				font-size: 1.15rem;
+				color: var(--color-text-muted);
+				margin-bottom: 1.5rem;
+				line-height: 1.6;
+			}
+
+			.bio-paragraph {
+				font-size: 1rem;
+				line-height: 1.8;
+				color: var(--color-text-main);
+				margin-bottom: 1rem;
+			}
+
+			/* pseudoyu style Subnav Tabs */
+			.subnav-tabs {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 1.5rem;
+				font-size: 1.6rem;
+				font-weight: 700;
+				letter-spacing: -0.02em;
+				margin: 2rem 0 3rem 0;
+				padding-bottom: 0.5rem;
+			}
+
+			.subnav-tab {
+				color: var(--color-text-main);
+				opacity: 0.25;
+				text-decoration: none;
+				transition: opacity 0.15s ease;
+			}
+
+			.subnav-tab:hover {
+				opacity: 0.7;
+				text-decoration: none;
+			}
+
+			.subnav-tab.active {
+				opacity: 1;
+				text-decoration: underline;
+				text-underline-offset: 8px;
+			}
+
+			/* pseudoyu Talks Section Style */
+			.talks-group {
+				margin-bottom: 2.5rem;
+			}
+
+			.group-heading {
+				font-size: 1.15rem;
+				font-weight: 700;
+				color: var(--color-text-main);
+				margin: 1.5rem 0 0.75rem 0;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.talk-item-row {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 1rem;
+				padding: 0.85rem 0;
+				border-bottom: 1px dashed var(--color-border);
+				transition: background-color 0.15s ease;
+			}
+
+			.talk-item-row:hover {
+				background-color: var(--color-surface-hover);
+				border-radius: 6px;
+				padding-left: 0.5rem;
+				padding-right: 0.5rem;
+			}
+
+			.talk-left {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+				flex: 1;
+				min-width: 280px;
+			}
+
+			.talk-title-line {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.talk-title-link {
+				font-size: 1rem;
+				font-weight: 600;
+				color: var(--color-text-main);
+				text-decoration: none;
+			}
+
+			.talk-title-link:hover {
+				color: var(--color-accent);
+				text-decoration: underline;
+			}
+
+			.tag-pill {
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				padding: 0.1rem 0.45rem;
+				border-radius: 4px;
+				background: var(--color-surface-hover);
+				color: var(--color-text-dim);
+				border: 1px solid var(--color-border);
+			}
+
+			.tag-pill-highlight {
+				background: var(--color-accent-surface);
+				color: var(--color-accent);
+				border-color: var(--color-accent);
+			}
+
+			.talk-meta {
+				font-size: 0.82rem;
+				font-family: var(--font-mono);
+				color: var(--color-text-dim);
+			}
+
+			.talk-actions {
+				display: flex;
+				align-items: center;
+				gap: 0.85rem;
+				font-family: var(--font-mono);
+				font-size: 0.82rem;
+			}
+
+			.talk-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.25rem;
+				color: var(--color-text-muted);
+				opacity: 0.6;
+				text-decoration: none;
+				transition: opacity 0.15s ease, color 0.15s ease;
+			}
+
+			.talk-btn:hover {
+				opacity: 1;
+				color: var(--color-accent);
+				text-decoration: none;
+			}
+
+			/* pseudoyu Projects Grid Style */
+			.projects-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 1rem;
+				margin-top: 1rem;
+			}
+
+			.project-item {
+				padding: 1rem 1.15rem;
+				border-radius: 8px;
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				text-decoration: none;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				gap: 0.5rem;
+				transition: border-color 0.15s ease, transform 0.15s ease;
+			}
+
+			.project-item:hover {
+				border-color: var(--color-accent);
+				transform: translateY(-2px);
+				text-decoration: none;
+			}
+
+			.project-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.project-name {
+				font-size: 1.05rem;
+				font-weight: 600;
+				color: var(--color-text-main);
+			}
+
+			.project-desc {
+				font-size: 0.88rem;
+				color: var(--color-text-dim);
+				margin: 0;
+				line-height: 1.5;
+			}
+
+			.project-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.35rem;
+				margin-top: 0.25rem;
+			}
+
+			/* Posts List Style */
+			.posts-list {
+				list-style: none;
+				padding: 0;
+				margin: 1rem 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.85rem;
+			}
+
+			.post-entry {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				padding: 0.5rem 0;
+				border-bottom: 1px dashed var(--color-border);
+			}
+
+			.post-title {
+				font-size: 1rem;
+				font-weight: 500;
+				color: var(--color-text-main);
+				text-decoration: none;
+			}
+
+			.post-title:hover {
+				color: var(--color-accent);
+			}
+
+			.post-date {
+				font-family: var(--font-mono);
+				font-size: 0.84rem;
+				color: var(--color-text-dim);
+				flex-shrink: 0;
+			}
+
+			/* Terminal command jump */
+			.terminal-cd-jump {
+				margin: 3.5rem 0 1.5rem 0;
+				font-family: var(--font-mono);
+				font-size: 0.95rem;
+				color: var(--color-text-dim);
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.terminal-cd-link {
+				color: var(--color-accent);
+				text-decoration: underline;
+				text-underline-offset: 4px;
+				font-weight: 600;
+			}
+
+			@media (max-width: 640px) {
+				.subnav-tabs {
+					font-size: 1.3rem;
+					gap: 1rem;
+				}
+
+				.author-name {
+					font-size: 2rem;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>{SITE_TITLE}</h1>
-			<p>{SITE_DESCRIPTION}</p>
+			<div class="content-wrapper">
+				<!-- 顶部个人介绍 (pseudoyu 风格) -->
+				<section class="intro-section">
+					<h1 class="author-name">{SITE_TITLE}</h1>
+					<div class="author-tagline">
+						机器学习与系统优化开发者 · 探索大规模分布式训练与高效推理系统
+					</div>
 
-			<h2>最新文章</h2>
-			<ul>
-				{posts.map((post) => (
-					<li>
-						<a href={`/blog/${post.id}/`}>{post.data.title}</a>
-						<em>
-							<FormattedDate date={post.data.pubDate} />
-						</em>
-						{post.data.description && <p>{post.data.description}</p>}
-					</li>
-				))}
-			</ul>
+					<p class="bio-paragraph">
+						你好，我是 <strong>{SITE_TITLE}</strong>，专注于 LLM 推理加速运行时、异构 GPU 集群分布式调度优化以及底层算子融合实现。
+					</p>
 
-			<p>
-				<a href="/blog/">查看全部文章</a> · <a href="/rss.xml">RSS 订阅</a>
-			</p>
+					<p class="bio-paragraph">
+						教育背景：<strong>[你的学校]</strong> · 计算机科学与技术 / 人工智能方向。日常在实验室与工程落地中推进科研项目，记录系统设计与踩坑反思。
+					</p>
+
+					<p class="bio-paragraph" style="font-size: 0.92rem; color: var(--color-text-dim);">
+						你可以浏览我的 <a href="#projects">精选开源工程</a>、查阅 <a href="#talks">学术论文与演讲</a>，或者查看全部 <a href="/blog">技术博客文章</a>。如有交流需要，欢迎通过 <a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a> 或邮件 <span style="font-family: var(--font-mono);">[你的邮箱]</span> 联系。
+					</p>
+				</section>
+
+				<!-- 标志性大字切换 Tabs (Blog · Projects · Talks · Workbench) -->
+				<nav class="subnav-tabs" aria-label="Page Sections">
+					<a href="#talks" class="subnav-tab active">Talks &amp; Papers</a>
+					<a href="#projects" class="subnav-tab">Projects</a>
+					<a href="/blog" class="subnav-tab">Blog</a>
+					<a href="/workbench" class="subnav-tab">Workbench</a>
+					<a href="/about" class="subnav-tab">About</a>
+				</nav>
+
+				<!-- 核心板块 1: 学术成果与演讲 (严格遵循 pseudoyu.com/talks 经典排版) -->
+				<section id="talks" style="scroll-margin-top: 5rem;">
+					<div class="watermark-container">
+						<span class="watermark-text">Talks</span>
+						<h2 class="section-anchor">Latest Talks &amp; Papers</h2>
+					</div>
+
+					<!-- SysML 成果 -->
+					<div class="talks-group">
+						<h3 class="group-heading">
+							<span>SysML 2026</span>
+							<span style="font-weight: 400; font-size: 0.85rem; color: var(--color-text-dim);">· San Jose, CA</span>
+						</h3>
+						<div class="talk-item-row">
+							<div class="talk-left">
+								<div class="talk-title-line">
+									<a href="/workbench#papers" class="talk-title-link">
+										Efficient Tensor Parallelism and Memory Optimization for Large-Scale Transformer Systems
+									</a>
+									<span class="tag-pill tag-pill-highlight">CCF-A</span>
+									<span class="tag-pill">Camera-Ready</span>
+								</div>
+								<div class="talk-meta">
+									[你的名字], Collaborators · Conference on Machine Learning and Systems · 2026
+								</div>
+							</div>
+							<div class="talk-actions">
+								<a href="#" class="talk-btn" title="阅读预印本 PDF">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+									PDF
+								</a>
+								<a href="#" class="talk-btn" title="查看演示文稿">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+									Slides
+								</a>
+								<a href="#" class="talk-btn" title="复现代码仓库">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
+									Code
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<!-- ICML Workshop -->
+					<div class="talks-group">
+						<h3 class="group-heading">
+							<span>ICML Workshop 2025</span>
+							<span style="font-weight: 400; font-size: 0.85rem; color: var(--color-text-dim);">· Vienna / Online</span>
+						</h3>
+						<div class="talk-item-row">
+							<div class="talk-left">
+								<div class="talk-title-line">
+									<a href="/workbench#papers" class="talk-title-link">
+										Low-Latency Speculative Decoding with Dynamic Draft Verification
+									</a>
+									<span class="tag-pill tag-pill-highlight">ICML '25</span>
+									<span class="tag-pill">Published</span>
+								</div>
+								<div class="talk-meta">
+									[你的名字], Research Advisor · Efficient Foundation Models Workshop · 2025
+								</div>
+							</div>
+							<div class="talk-actions">
+								<a href="#" class="talk-btn" title="观看录播">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+									Watch
+								</a>
+								<a href="#" class="talk-btn" title="查看演示文稿">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+									Slides
+								</a>
+								<a href="#" class="talk-btn" title="阅读论文全文">
+									<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+									PDF
+								</a>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- 核心板块 2: 精选项目 (遵循 pseudoyu.com/projects 现代网格卡片) -->
+				<section id="projects" style="scroll-margin-top: 5rem; margin-top: 3.5rem;">
+					<div class="watermark-container">
+						<span class="watermark-text">Projects</span>
+						<h2 class="section-anchor">Featured Projects</h2>
+					</div>
+
+					<div class="projects-grid">
+						<a href="/workbench#projects" class="project-item">
+							<div class="project-header">
+								<span class="project-name">FastInfer-Engine</span>
+								<span class="tag-pill tag-pill-highlight">C++20 / CUDA</span>
+							</div>
+							<p class="project-desc">
+								面向大语言模型的高吞吐自研推理运行时，支持 FlashAttention 算子融合与虚拟分页 KV-Cache 内存池管理。
+							</p>
+							<div class="project-tags">
+								<span class="tag-pill">P99 &lt; 8.2ms</span>
+								<span class="tag-pill">TensorRT-LLM</span>
+								<span class="tag-pill">FusedKernel</span>
+							</div>
+						</a>
+
+						<a href="/workbench#projects" class="project-item">
+							<div class="project-header">
+								<span class="project-name">DistFlow-Scheduler</span>
+								<span class="tag-pill tag-pill-highlight">Python / PyTorch</span>
+							</div>
+							<p class="project-desc">
+								异构 GPU 集群分布式训练拓扑编排器。利用梯度通信与前向流水线智能重叠，压榨跨机 NVLink 带宽。
+							</p>
+							<div class="project-tags">
+								<span class="tag-pill">Speedup 1.34x</span>
+								<span class="tag-pill">NCCL</span>
+								<span class="tag-pill">FaultTolerance</span>
+							</div>
+						</a>
+
+						<a href="/workbench#projects" class="project-item">
+							<div class="project-header">
+								<span class="project-name">ruyishu.github.io</span>
+								<span class="tag-pill tag-pill-highlight">Astro 7 / TS</span>
+							</div>
+							<p class="project-desc">
+								当前静态技术博客与个人工作台，极简排版、零框架臃肿、双 Shiki 代码高亮与可收缩侧边栏。
+							</p>
+							<div class="project-tags">
+								<span class="tag-pill">Pure Static</span>
+								<span class="tag-pill">Zero-JS Main</span>
+								<span class="tag-pill">Dark Mode</span>
+							</div>
+						</a>
+					</div>
+				</section>
+
+				<!-- 核心板块 3: 最新撰写的博客文章 (pseudoyu 风格时间线列表) -->
+				<section style="margin-top: 3.5rem;">
+					<div class="watermark-container">
+						<span class="watermark-text">Posts</span>
+						<h2 class="section-anchor">Recent Posts</h2>
+					</div>
+
+					<ul class="posts-list">
+						{
+							posts.map((post) => (
+								<li class="post-entry">
+									<a href={`/blog/${post.id}/`} class="post-title">
+										{post.data.title}
+									</a>
+									<span class="post-date">
+										<FormattedDate date={post.data.pubDate} />
+									</span>
+								</li>
+							))
+						}
+					</ul>
+
+					<div style="margin-top: 1rem;">
+						<a href="/blog" style="font-size: 0.9rem; font-family: var(--font-mono); color: var(--color-accent);">
+							查看全部文章归档 →
+						</a>
+					</div>
+				</section>
+
+				<!-- pseudoyu 风格的终端引导跳转 (cd ./workbench) -->
+				<div class="terminal-cd-jump">
+					<span style="opacity: 0.5;">&gt;</span>
+					<span>进入博主专属控制台：</span>
+					<a href="/workbench" class="terminal-cd-link">cd ./workbench</a>
+				</div>
+			</div>
 		</main>
 		<Footer />
 	</body>

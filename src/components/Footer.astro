@@ -4,31 +4,76 @@ import { SITE_AUTHOR } from '../consts';
 const today = new Date();
 ---
 
-<footer>
-	&copy; {today.getFullYear()} {SITE_AUTHOR}. All rights reserved.
-	<div class="social-links">
-		<a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a>
-		<a href="/rss.xml">RSS</a>
+<footer class="footer-wrapper">
+	<div class="footer-inner">
+		<div class="footer-left">
+			<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer" class="cc-badge">
+				CC BY-NC-SA 4.0
+			</a>
+			<span>{today.getFullYear()} © {SITE_AUTHOR}</span>
+		</div>
+		<div class="footer-right">
+			<a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">GitHub</a>
+			<span>·</span>
+			<a href="/blog">Blog</a>
+			<span>·</span>
+			<a href="/workbench">Workbench</a>
+			<span>·</span>
+			<a href="/rss.xml">RSS</a>
+		</div>
 	</div>
 </footer>
+
 <style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
+	.footer-wrapper {
+		max-width: 48rem;
+		width: 100%;
+		margin: 3rem auto 2rem auto;
+		padding: 1.5rem 1.25rem 0 1.25rem;
+		border-top: 1px solid var(--color-border);
+		color: var(--color-text-dim);
+		font-family: var(--font-mono);
+		font-size: 0.82rem;
 	}
-	.social-links {
+
+	.footer-inner {
 		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.75rem;
 	}
-	.social-links a {
+
+	.footer-left {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.cc-badge {
+		color: var(--color-text-dim);
 		text-decoration: none;
-		color: rgb(var(--gray));
+		opacity: 0.8;
 	}
-	.social-links a:hover {
-		color: rgb(var(--gray-dark));
+
+	.cc-badge:hover {
+		color: var(--color-text-main);
+		text-decoration: underline;
+	}
+
+	.footer-right {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+	}
+
+	.footer-right a {
+		color: var(--color-text-dim);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+
+	.footer-right a:hover {
+		color: var(--color-text-main);
 	}
 </style>

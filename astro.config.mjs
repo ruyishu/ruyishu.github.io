@@ -8,6 +8,15 @@ import { defineConfig, fontProviders } from 'astro/config';
 export default defineConfig({
 	site: 'https://ruyishu.github.io',
 	integrations: [mdx(), sitemap()],
+	markdown: {
+		shikiConfig: {
+			themes: {
+				light: 'github-light',
+				dark: 'github-dark',
+			},
+			wrap: false,
+		},
+	},
 	fonts: [
 		{
 			provider: fontProviders.local(),

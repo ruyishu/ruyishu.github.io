@@ -5,26 +5,36 @@ import Layout from '../layouts/BlogPost.astro';
 <Layout
 	title="关于"
 	description="关于我 · ZK Blog"
-	pubDate={new Date('2026-09-20')}
+	hideDate={true}
 >
 	<p>
 		<em>（这段是占位内容，把方括号里的信息换成你自己的再发布。）</em>
 	</p>
 
 	<p>
-		我是 <strong>[你的名字]</strong>，目前在做 [你的方向，例如：机器学习 / 后端开发]。这里记录我读过的东西、做过的项目，以及一些不太成熟的想法。
+		我是 <strong>[你的名字]</strong>，目前在做 [你的方向，例如：机器学习 / 系统方向开发]。这里记录我读过的东西、做过的项目，以及一些不太成熟的想法。
+	</p>
+
+	<h2>教育与经历</h2>
+	<p>
+		毕业/就读于 <strong>[你的学校]</strong> · [你的专业]，主攻机器学习与系统性能优化。日常关注大规模模型训练与推理系统、分布式架构以及低延迟计算。
 	</p>
 
 	<h2>这个站</h2>
 	<p>
-		用 <a href="https://astro.build/">Astro</a> 生成静态页面，托管在 GitHub Pages，push 即自动部署。文章以 Markdown 存在
-		<a href="https://github.com/ruyishu/ruyishu.github.io">这个仓库</a>里。
+		采用现代精简排版系统构建，基于 <a href="https://astro.build/">Astro</a> 静态生成，零多余客户端 JavaScript，纯粹文字与思考驱动。托管在 GitHub Pages，push 即可自动部署。文章以 Markdown 存储在
+		<a href="https://github.com/ruyishu/ruyishu.github.io" target="_blank" rel="noopener noreferrer">这个仓库</a>中。
 	</p>
 
-	<h2>联系我</h2>
+	<h2>个人工作台</h2>
+	<p>
+		站点设有 <a href="/workbench">个人工作台 (Workbench)</a>，集成博客索引、代码仓库追踪、论文研读清单与实验备忘录。可根据需要切换公开展示或私密保护状态。
+	</p>
+
+	<h2>联系方式</h2>
 	<ul>
-		<li>GitHub：<a href="https://github.com/ruyishu">ruyishu</a></li>
+		<li>GitHub：<a href="https://github.com/ruyishu" target="_blank" rel="noopener noreferrer">ruyishu</a></li>
 		<li>邮箱：<a href="mailto:[你的邮箱]">[你的邮箱]</a></li>
-		<li>RSS：<a href="/rss.xml">/rss.xml</a></li>
+		<li>RSS 订阅：<a href="/rss.xml">/rss.xml</a></li>
 	</ul>
 </Layout>
