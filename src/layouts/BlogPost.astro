@@ -110,5 +110,12 @@ const { title, description, pubDate, updatedDate, heroImage, hideDate = false } 
 			</article>
 		</main>
 		<Footer />
+		<script is:inline>
+			// 正文图片已被限制在正文宽度内，点一下在新标签页看原图
+			document.querySelectorAll('.prose img').forEach((img) => {
+				img.addEventListener('click', () => window.open(img.currentSrc || img.src, '_blank', 'noopener'));
+			});
+		</script>
+
 	</body>
 </html>

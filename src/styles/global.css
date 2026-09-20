@@ -217,6 +217,17 @@ html[data-theme="dark"] .astro-code span {
 	}
 }
 
+/* Image styling */
+.prose img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 1.5rem auto;
+	border-radius: 8px;
+	border: 1px solid var(--color-border);
+	cursor: zoom-in;
+}
+
 /* Table styling */
 table {
 	width: 100%;
