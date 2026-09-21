@@ -1,0 +1,100 @@
+---
+import { SITE_TITLE } from '../consts';
+
+interface Props {
+	page: string;
+}
+
+const { page } = Astro.props;
+---
+
+<section class="lock-panel">
+	<div class="lock-eyebrow">
+		<span class="lock-dot"></span>
+		<span>ruyishu@lab:~$ access-control --status</span>
+	</div>
+
+	<h1 class="lock-title">暂无权限</h1>
+
+	<p class="lock-desc">
+		「{page}」当前未对外开放，博主需要时会打开。
+	</p>
+
+	<div class="lock-actions">
+		<a href="/">← 返回首页</a>
+		<a href="/blog">看看博客文章</a>
+	</div>
+
+	<div class="lock-foot">{SITE_TITLE}</div>
+</section>
+
+<style>
+	.lock-panel {
+		border: 1px dashed var(--color-border);
+		border-radius: 10px;
+		padding: 3rem 2rem;
+		background: var(--color-surface);
+		text-align: center;
+	}
+
+	.lock-eyebrow {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		color: var(--color-text-dim);
+		margin-bottom: 1.5rem;
+	}
+
+	.lock-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--color-text-dim);
+	}
+
+	.lock-title {
+		font-size: 2.6rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		margin: 0 0 0.75rem 0;
+	}
+
+	.lock-desc {
+		margin: 0 auto 2rem auto;
+		max-width: 26rem;
+		font-size: 0.95rem;
+		color: var(--color-text-muted);
+	}
+
+	.lock-actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 1.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+	}
+
+	.lock-foot {
+		margin-top: 2.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		color: var(--color-text-dim);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	@media (max-width: 640px) {
+		.lock-panel {
+			padding: 2rem 1.25rem;
+		}
+
+		.lock-title {
+			font-size: 2rem;
+		}
+	}
+</style>

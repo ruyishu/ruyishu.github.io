@@ -1,0 +1,432 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+import { BENCH_LINKS, BENCH_TABLES, CRAWLED_AT } from '../data/bench';
+
+// 每张榜先只展示这么多行，其余由 View all 展开。
+const COLLAPSED_ROWS = 3;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead
+			title={`Bench · ${SITE_TITLE}`}
+			description="各家大模型排行榜的汇总：Artificial Analysis、LMArena、TapTap Maker、OpenRouter 等，标注来源与数据截止日期"
+		/>
+		<style>
+			main {
+				max-width: 62rem;
+				padding: 2rem 1.5rem 5rem 1.5rem;
+			}
+
+			.bench-head {
+				padding-bottom: 1.5rem;
+				border-bottom: 1px solid var(--color-border);
+				margin-bottom: 2.5rem;
+			}
+
+			.bench-title {
+				font-size: 2.4rem;
+				font-weight: 800;
+				letter-spacing: -0.03em;
+				margin: 0 0 0.6rem 0;
+			}
+
+			.bench-desc {
+				max-width: 46rem;
+				font-size: 0.95rem;
+				line-height: 1.75;
+				color: var(--color-text-muted);
+				margin: 0;
+			}
+
+			/* 榜单 */
+			.board {
+				margin-bottom: 3rem;
+			}
+
+			.board-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 1px solid var(--color-border);
+			}
+
+			.board-head h2 {
+				margin: 0;
+				font-size: 1.2rem;
+				letter-spacing: -0.01em;
+			}
+
+			.board-source {
+				font-family: var(--font-mono);
+				font-size: 0.78rem;
+			}
+
+			.board-meta {
+				font-family: var(--font-mono);
+				font-size: 0.74rem;
+				color: var(--color-text-dim);
+				margin: 0.5rem 0 0.9rem 0;
+			}
+
+			.board-meta .flag {
+				margin-left: 0.5rem;
+				padding: 0.05rem 0.4rem;
+				border-radius: 999px;
+				border: 1px dashed #d97706;
+				color: #b45309;
+				background: rgba(217, 119, 6, 0.08);
+			}
+
+			:global(html[data-theme='dark']) .board-meta .flag {
+				color: #fbbf24;
+				border-color: #b45309;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				:global(html:not([data-theme='light'])) .board-meta .flag {
+					color: #fbbf24;
+					border-color: #b45309;
+				}
+			}
+
+			.board-cite {
+				font-size: 0.76rem;
+				line-height: 1.7;
+				color: var(--color-text-dim);
+				margin: 0 0 0.9rem 0;
+				padding-left: 0.7rem;
+				border-left: 2px solid var(--color-border);
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.88rem;
+				margin: 0;
+			}
+
+			th {
+				font-family: var(--font-mono);
+				font-size: 0.72rem;
+				font-weight: 600;
+				color: var(--color-text-dim);
+				text-align: left;
+				padding: 0.4rem 0.6rem 0.4rem 0;
+				border-bottom: 1px solid var(--color-border);
+			}
+
+			td {
+				padding: 0.5rem 0.6rem 0.5rem 0;
+				border-bottom: 1px dashed var(--color-border);
+				color: var(--color-text-muted);
+				vertical-align: top;
+			}
+
+			th:first-child,
+			td:first-child {
+				width: 3.5rem;
+				font-family: var(--font-mono);
+				color: var(--color-text-dim);
+			}
+
+			.rank-note {
+				display: block;
+				font-size: 0.7em;
+				opacity: 0.75;
+			}
+
+			td.model {
+				color: var(--color-text-main);
+				font-weight: 500;
+				min-width: 12rem;
+			}
+
+			td.model .org {
+				display: block;
+				font-family: var(--font-mono);
+				font-size: 0.72rem;
+				font-weight: 400;
+				color: var(--color-text-dim);
+			}
+
+			td.num {
+				font-family: var(--font-mono);
+				color: var(--color-text-main);
+				white-space: nowrap;
+			}
+
+			.view-all {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.45rem;
+				margin-top: 0.9rem;
+				padding: 0.35rem 0.85rem;
+				border: 1px solid var(--color-border);
+				border-radius: 999px;
+				background: var(--color-surface);
+				color: var(--color-text-muted);
+				font-family: var(--font-mono);
+				font-size: 0.76rem;
+				cursor: pointer;
+				transition: border-color 0.15s ease, color 0.15s ease;
+			}
+
+			.view-all:hover {
+				border-color: var(--color-accent);
+				color: var(--color-accent);
+			}
+
+			.view-all svg {
+				transition: transform 0.18s ease;
+			}
+
+			.view-all.is-open svg {
+				transform: rotate(180deg);
+			}
+
+			.board-note {
+				margin: 0.9rem 0 0 0;
+				font-size: 0.78rem;
+				line-height: 1.7;
+				color: var(--color-text-dim);
+			}
+
+			/* 其他榜单 */
+			.other-head {
+				padding-bottom: 0.5rem;
+				border-bottom: 1px solid var(--color-border);
+				margin-bottom: 1rem;
+			}
+
+			.other-head h2 {
+				margin: 0;
+				font-size: 1.2rem;
+			}
+
+			.other-list {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+				gap: 0.6rem;
+			}
+
+			.other-item {
+				border: 1px solid var(--color-border);
+				border-radius: 8px;
+				padding: 0.75rem 0.9rem;
+				background: var(--color-surface);
+			}
+
+			.other-name {
+				font-size: 0.9rem;
+				font-weight: 600;
+				text-decoration: none;
+			}
+
+			.other-what {
+				margin: 0.3rem 0 0 0;
+				font-size: 0.78rem;
+				line-height: 1.6;
+				color: var(--color-text-dim);
+			}
+
+			/* 数据归属 */
+			.attribution {
+				margin-top: 1rem;
+				padding-top: 1.25rem;
+				border-top: 1px solid var(--color-border);
+			}
+
+			.attribution h2 {
+				font-size: 1rem;
+				margin-bottom: 0.6rem;
+			}
+
+			.attribution p {
+				margin: 0 0 0.6rem 0;
+				font-size: 0.82rem;
+				line-height: 1.75;
+				color: var(--color-text-dim);
+			}
+
+			@media (max-width: 640px) {
+				main {
+					padding: 1.5rem 1.1rem 4rem 1.1rem;
+				}
+
+				.bench-title {
+					font-size: 1.9rem;
+				}
+
+				td.model {
+					min-width: 8rem;
+				}
+
+				table {
+					font-size: 0.82rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+
+		<main>
+			<section class="bench-head">
+				<h1 class="bench-title">Bench</h1>
+				<p class="bench-desc">
+					各家大模型排行榜的汇总。数据是人工抄录的，每条都标了来源和截止日期 —— 榜单天天在动，用之前请点进去核对。
+					最后更新时间 {CRAWLED_AT}。
+				</p>
+			</section>
+
+			{
+				BENCH_TABLES.map((table) => (
+					<section class="board">
+						<div class="board-head">
+							<h2>{table.name}</h2>
+							<a class="board-source" href={table.url} target="_blank" rel="noopener noreferrer">
+								完整榜 →
+							</a>
+						</div>
+
+						<div class="board-meta">
+							{table.org} · 数据截至 {table.asOf}
+							{table.total && ` · ${table.total}`} · {table.scope}
+							{table.provenance === 'snapshot' && <span class="flag">转抄待核</span>}
+						</div>
+
+						<p class="board-cite">
+							{table.org}.《{table.name}》. 数据截至 {table.asOf}.{' '}
+							<a href={table.url} target="_blank" rel="noopener noreferrer">
+								{table.url}
+							</a>
+							（{CRAWLED_AT} 访问
+							{table.provenance === 'snapshot' ? '，经搜索引擎快照转抄' : ''}）
+						</p>
+
+						<table>
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>模型</th>
+									{table.headers.map((header) => (
+										<th>{header}</th>
+									))}
+								</tr>
+							</thead>
+							<tbody>
+								{table.rows.map((row, index) => (
+									<tr hidden={index >= COLLAPSED_ROWS}>
+										<td>
+											{row.rank}
+											{row.rankNote && <span class="rank-note">{row.rankNote}</span>}
+										</td>
+										<td class="model">
+											{row.model}
+											<span class="org">{row.org}</span>
+										</td>
+										{row.values.map((value) => (
+											<td class="num">{value}</td>
+										))}
+									</tr>
+								))}
+							</tbody>
+						</table>
+
+						{table.rows.length > COLLAPSED_ROWS && (
+							<button class="view-all" type="button" hidden>
+								<svg
+									viewBox="0 0 24 24"
+									width="13"
+									height="13"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<polyline points="6 9 12 15 18 9" />
+								</svg>
+								<span class="view-all-text">View all</span>
+								<span class="view-all-more">+{table.rows.length - COLLAPSED_ROWS}</span>
+							</button>
+						)}
+
+						{table.note && <p class="board-note">{table.note}</p>}
+					</section>
+				))
+			}
+
+			<section>
+				<div class="other-head">
+					<h2>其他榜单</h2>
+				</div>
+				<div class="other-list">
+					{
+						BENCH_LINKS.map((link) => (
+							<div class="other-item">
+								<a class="other-name" href={link.url} target="_blank" rel="noopener noreferrer">
+									{link.name}
+								</a>
+								<p class="other-what">
+									{link.org} · {link.what}
+								</p>
+							</div>
+						))
+					}
+				</div>
+			</section>
+			<section class="attribution">
+				<h2>数据归属</h2>
+				<p>
+					本页的分数与排名全部来自上面各表标注的原始榜单，版权归各原作者与机构所有。这里只做少量节选、注明来源与数据截止日期，
+					并给出回源链接——<strong>要引用或以某个数字为准，请点进原始榜单核对</strong>，不要以本页为准。
+				</p>
+				<p>
+					其中「致知」是个人项目，原站与仓库均未声明许可条款或引用格式，此处按「署名 + 节选 + 回链」处理。
+					任何权利人如果认为本页的处理方式不受，联系我即可调整或删除。
+				</p>
+			</section>
+		</main>
+
+		<Footer />
+
+		<script>
+			(() => {
+				// 每张榜超过 COLLAPSED_ROWS 行的部分默认收起。
+				// 按钮在 HTML 里是 hidden 的，没 JS 时不会出现点不动的按钮。
+				document.querySelectorAll<HTMLElement>('.view-all').forEach((button) => {
+					const board = button.closest<HTMLElement>('.board');
+					if (!board) return;
+
+					const rows = Array.from(board.querySelectorAll<HTMLElement>('tbody tr'));
+					const extras = rows.slice(3);
+					if (extras.length === 0) return;
+
+					const text = button.querySelector('.view-all-text');
+					button.hidden = false;
+					button.setAttribute('aria-expanded', 'false');
+
+					button.addEventListener('click', () => {
+						const expanded = button.getAttribute('aria-expanded') === 'true';
+						extras.forEach((row) => {
+							row.hidden = expanded;
+						});
+						button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+						button.classList.toggle('is-open', !expanded);
+						if (text) text.textContent = expanded ? 'View all' : '收起';
+						const more = button.querySelector('.view-all-more');
+						if (more) more.hidden = !expanded;
+						if (expanded) board.scrollIntoView({ block: 'start' });
+					});
+				});
+			})();
+		</script>
+	</body>
+</html>

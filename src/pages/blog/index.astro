@@ -8,6 +8,9 @@ import { postsByCategory } from '../../utils/blog';
 
 const groups = (await postsByCategory()).filter((group) => group.posts.length > 0);
 const total = groups.reduce((count, group) => count + group.posts.length, 0);
+
+// 每个分类先只展示这么多，其余藏起来由 View all 展开。
+const COLLAPSED_COUNT = 3;
 ---
 
 <!doctype html>
@@ -109,6 +112,46 @@ const total = groups.reduce((count, group) => count + group.posts.length, 0);
 				line-height: 1.6;
 			}
 
+			.group-count {
+				font-family: var(--font-mono);
+				font-size: 0.78rem;
+				font-weight: 400;
+				color: var(--color-text-dim);
+			}
+
+			.view-all {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.45rem;
+				margin-top: 1rem;
+				padding: 0.4rem 0.9rem;
+				border: 1px solid var(--color-border);
+				border-radius: 999px;
+				background: var(--color-surface);
+				color: var(--color-text-muted);
+				font-family: var(--font-mono);
+				font-size: 0.78rem;
+				cursor: pointer;
+				transition: border-color 0.15s ease, color 0.15s ease;
+			}
+
+			.view-all:hover {
+				border-color: var(--color-accent);
+				color: var(--color-accent);
+			}
+
+			.view-all-chevron {
+				transition: transform 0.18s ease;
+			}
+
+			.view-all.is-open .view-all-chevron {
+				transform: rotate(180deg);
+			}
+
+			.view-all-more {
+				color: var(--color-text-dim);
+			}
+
 			@media (max-width: 640px) {
 				.post-item {
 					padding: 0.85rem 1rem;
@@ -131,11 +174,14 @@ const total = groups.reduce((count, group) => count + group.posts.length, 0);
 
 			{
 				groups.map((group) => (
-					<section class="group-section">
-						<h2 class="group-title">{group.category.label}</h2>
+					<section class="group-section" data-keep={COLLAPSED_COUNT}>
+						<h2 class="group-title">
+								{group.category.label}
+								<span class="group-count">{group.posts.length}</span>
+							</h2>
 						<ul class="post-list">
-							{group.posts.map((post) => (
-								<li class="post-item">
+							{group.posts.map((post, index) => (
+								<li class="post-item" hidden={index >= COLLAPSED_COUNT}>
 									<div class="post-meta">
 										<FormattedDate date={post.data.pubDate} />
 									</div>
@@ -148,10 +194,50 @@ const total = groups.reduce((count, group) => count + group.posts.length, 0);
 								</li>
 							))}
 						</ul>
+						{group.posts.length > COLLAPSED_COUNT && (
+							<button class="view-all" type="button" hidden>
+								<svg class="view-all-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+								<span class="view-all-text">View all</span>
+								<span class="view-all-more">+{group.posts.length - COLLAPSED_COUNT}</span>
+							</button>
+						)}
 					</section>
 				))
 			}
 		</main>
 		<Footer />
+		<script>
+			(() => {
+				// 分类下超过 data-keep 篇的部分默认收起，由 View all 展开。
+				// 按钮本身在 HTML 里是 hidden 的，无 JS 时不会出现一个点不动的按钮。
+				document.querySelectorAll<HTMLElement>('.view-all').forEach((button) => {
+					const section = button.closest<HTMLElement>('.group-section');
+					if (!section) return;
+
+					const keep = Number(section.dataset.keep ?? 3);
+					const extras = Array.from(
+						section.querySelectorAll<HTMLElement>(`.post-item:nth-child(n + ${keep + 1})`),
+					);
+					if (extras.length === 0) return;
+
+					const text = button.querySelector('.view-all-text');
+					const more = button.querySelector('.view-all-more');
+					button.hidden = false;
+					button.setAttribute('aria-expanded', 'false');
+
+					button.addEventListener('click', () => {
+						const expanded = button.getAttribute('aria-expanded') === 'true';
+						extras.forEach((item) => {
+							item.hidden = expanded;
+						});
+						button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+						button.classList.toggle('is-open', !expanded);
+						if (text) text.textContent = expanded ? 'View all' : '收起';
+						if (more) more.hidden = !expanded;
+						if (expanded) section.scrollIntoView({ block: 'start' });
+					});
+				});
+			})();
+		</script>
 	</body>
 </html>

@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "gate": "node scripts/gate.mjs",
     "astro": "astro"
   },
   "dependencies": {

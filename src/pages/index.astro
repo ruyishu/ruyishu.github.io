@@ -4,7 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { BENCH_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -157,11 +157,7 @@ const posts = (await getCollection('blog')).sort(
 					</div>
 
 					<p class="bio-paragraph">
-						你好，我是 <strong>如意鼠</strong>，大模型算法工程师。关注大语言模型与多模态模型的训练优化（SFT、GRPO、蒸馏）、长音频推理与自动化评测闭环。
-					</p>
-
-					<p class="bio-paragraph">
-						硕士毕业于 <strong>清华大学</strong>，本科毕业于 <strong>安徽大学</strong>。
+						你好，我是 <strong>如意鼠</strong>，大模型算法工程师。关注大模型的训练优化（SFT、GRPO、蒸馏）、推理与自动化评测闭环。
 					</p>
 
 					<p class="bio-paragraph" style="font-size: 0.92rem; color: var(--color-text-dim);">
@@ -172,7 +168,7 @@ const posts = (await getCollection('blog')).sort(
 				<!-- 大字切换 Tabs (Posts · Workbench · About) -->
 				<nav class="subnav-tabs" aria-label="Page Sections">
 					<a href="/blog" class="subnav-tab active">Posts</a>
-					<a href="/workbench" class="subnav-tab">Workbench</a>
+					<a href={BENCH_URL} class="subnav-tab">Bench</a>
 					<a href="/about" class="subnav-tab">About</a>
 				</nav>
 
