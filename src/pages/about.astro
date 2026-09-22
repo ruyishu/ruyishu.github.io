@@ -3,8 +3,9 @@ import AccessLocked from '../components/AccessLocked.astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import PaperFigure from '../components/PaperFigure.astro';
 import { PAGE_ACCESS, SITE_TITLE } from '../consts';
-import { EDUCATION, EXPERIENCES, LINKS, METRICS, PROFILE, PROJECTS, SKILLS } from '../data/resume';
+import { EDUCATION, EXPERIENCES, LINKS, PROFILE, PROJECTS, SKILLS } from '../data/resume';
 
 // 关闭时整个 deck 不参与构建输出，只留下锁页。
 const open = PAGE_ACCESS.about;
@@ -197,13 +198,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				font-size: 1rem;
 				color: var(--color-text-muted);
 				margin-bottom: 0.85rem;
-			}
-
-			.hero-hint {
-				margin-top: 2rem;
-				font-family: var(--font-mono);
-				font-size: 0.75rem;
-				color: var(--color-text-dim);
 			}
 
 			/* ---------- 指标卡 ---------- */
@@ -493,6 +487,50 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				color: var(--color-text-dim);
 			}
 
+			/* ---------- 论文图 + 结果表（横跨「时间 + 正文」两列） ---------- */
+			.tl-item > .exp-extra {
+				grid-column: 1 / -1;
+			}
+
+			.result-table {
+				margin-top: 1.25rem;
+			}
+
+			.result-table table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.84rem;
+				margin: 0;
+			}
+
+			.result-table th {
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				font-weight: 600;
+				color: var(--color-text-dim);
+				text-align: left;
+				padding: 0.4rem 0.6rem 0.4rem 0;
+				border-bottom: 1px solid var(--color-border);
+			}
+
+			.result-table td {
+				padding: 0.45rem 0.6rem 0.45rem 0;
+				border-bottom: 1px dashed var(--color-border);
+				font-size: 0.84rem;
+				color: var(--color-text-muted);
+			}
+
+			.result-table td:first-child {
+				color: var(--color-text-main);
+				font-weight: 500;
+			}
+
+			.result-table td:nth-child(n + 3) {
+				font-family: var(--font-mono);
+				color: var(--color-text-dim);
+				width: 5.5rem;
+			}
+
 			/* ---------- 响应式 ---------- */
 			@media (max-width: 1100px) {
 				.deck-rail {
@@ -602,19 +640,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				<div class="hero-bio">
 					{PROFILE.bio.map((paragraph) => <p>{paragraph}</p>)}
 				</div>
-
-				<div class="metric-grid">
-					{
-						METRICS.map((metric) => (
-							<div class="metric-card">
-								<span class="metric-value">{metric.value}</span>
-								<span class="metric-label">{metric.label}</span>
-							</div>
-						))
-					}
-				</div>
-
-				<div class="hero-hint">{PROFILE.hint}</div>
 			</section>
 
 			<!-- 经历 -->
@@ -627,7 +652,7 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 
 				<div class="timeline">
 					{
-						EXPERIENCES.map((experience) => (
+						EXPERIENCES.map((experience, index) => (
 							<article class="tl-item">
 								<div class="tl-period">
 									{experience.period}
@@ -648,7 +673,43 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 											))}
 										</div>
 									)}
+
 								</div>
+
+								{(experience.figure || experience.results) && (
+									<div class="exp-extra">
+										{experience.figure && (
+											<PaperFigure
+												kind={experience.figure.kind}
+												caption={experience.figure.caption}
+												index={index + 1}
+											/>
+										)}
+
+										{experience.results && (
+											<div class="result-table">
+												<table>
+													<thead>
+														<tr>
+															{experience.results.cols.map((col) => (
+																<th>{col}</th>
+															))}
+														</tr>
+													</thead>
+													<tbody>
+														{experience.results.rows.map((row) => (
+															<tr>
+																{row.map((cell) => (
+																	<td>{cell}</td>
+																))}
+															</tr>
+														))}
+													</tbody>
+												</table>
+											</div>
+										)}
+									</div>
+								)}
 							</article>
 						))
 					}

@@ -1,0 +1,238 @@
+---
+// 论文风格的全流程示意图（手绘 SVG，非位图）。
+// kind: 'tooluse'（平安 · 工具调用闭环）/ 'mmrl'（百度 · 多模态 RL 两条问题线）
+interface Props {
+	kind: 'tooluse' | 'mmrl';
+	caption: string;
+	index: number;
+}
+
+const { kind, caption, index } = Astro.props;
+const headId = `fig-head-${kind}`;
+---
+
+<figure class="fig">
+	<svg
+		class="fig-svg"
+		viewBox={kind === 'tooluse' ? '0 0 960 400' : '0 0 960 380'}
+		role="img"
+		aria-label={caption}
+	>
+		<defs>
+			<marker
+				id={headId}
+				viewBox="0 0 10 10"
+				refX="9"
+				refY="5"
+				markerWidth="6"
+				markerHeight="6"
+				orient="auto-start-reverse"
+			>
+				<path class="fig-head" d="M0 0 L10 5 L0 10 z" />
+			</marker>
+		</defs>
+
+		{
+			kind === 'tooluse' ? (
+				<>
+					{/* ---- 阶段底板 ---- */}
+					<rect class="fig-band" x="56" y="26" width="868" height="118" rx="10" />
+					<rect class="fig-band" x="56" y="158" width="868" height="104" rx="10" />
+					<rect class="fig-band" x="56" y="276" width="868" height="104" rx="10" />
+
+					<text class="fig-stage" transform="translate(34,85) rotate(-90)" text-anchor="middle">
+						① 数据构造
+					</text>
+					<text class="fig-stage" transform="translate(34,210) rotate(-90)" text-anchor="middle">
+						② 训练
+					</text>
+					<text class="fig-stage" transform="translate(34,328) rotate(-90)" text-anchor="middle">
+						③ 评测与回流
+					</text>
+
+					{/* ---- ① 三个数据模块 ---- */}
+					<rect class="fig-box" x="86" y="53" width="240" height="64" rx="8" />
+					<text class="fig-title" x="206" y="80" text-anchor="middle">意图与工具定义</text>
+					<text class="fig-sub" x="206" y="98" text-anchor="middle">抽样调用意图 · 划定工具集合与参数边界</text>
+
+					<rect class="fig-box" x="370" y="53" width="240" height="64" rx="8" />
+					<text class="fig-title" x="490" y="80" text-anchor="middle">样本构造</text>
+					<text class="fig-sub" x="490" y="98" text-anchor="middle">正例 · 参数扰动负例 · 多步链路 · 应拒答</text>
+
+					<rect class="fig-box" x="654" y="53" width="240" height="64" rx="8" />
+					<text class="fig-title" x="774" y="80" text-anchor="middle">质量筛选</text>
+					<text class="fig-sub" x="774" y="98" text-anchor="middle">schema 可解析性 · 参数完整性 · 去重分层</text>
+
+					<path class="fig-arrow" d="M326 85 L362 85" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M610 85 L646 85" marker-end={`url(#${headId})`} />
+
+					{/* ---- ② 训练 ---- */}
+					<rect class="fig-box-accent" x="350" y="180" width="280" height="64" rx="8" />
+					<text class="fig-title" x="490" y="207" text-anchor="middle">基座训练（SFT）</text>
+					<text class="fig-sub" x="490" y="225" text-anchor="middle">「玲珑心」· 格式约束 + 工具选择 + 参数填充</text>
+
+					<path class="fig-arrow" d="M490 117 L490 172" marker-end={`url(#${headId})`} />
+
+					{/* ---- ③ 评测与回流 ---- */}
+					<rect class="fig-box" x="86" y="297" width="240" height="64" rx="8" />
+					<text class="fig-title" x="206" y="324" text-anchor="middle">pingan-700 评测</text>
+					<text class="fig-sub" x="206" y="342" text-anchor="middle">工具选择 / 参数完全匹配 / 多步链路</text>
+
+					<rect class="fig-box" x="370" y="297" width="240" height="64" rx="8" />
+					<text class="fig-title" x="490" y="324" text-anchor="middle">错误分层</text>
+					<text class="fig-sub" x="490" y="342" text-anchor="middle">失败样本按错误类型归档</text>
+
+					<rect class="fig-box" x="654" y="297" width="240" height="64" rx="8" />
+					<text class="fig-title" x="774" y="324" text-anchor="middle">定向回流</text>
+					<text class="fig-sub" x="774" y="342" text-anchor="middle">回灌下一轮训练集</text>
+
+					<path class="fig-arrow" d="M490 244 L490 270 L206 270 L206 289" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M326 329 L362 329" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M610 329 L646 329" marker-end={`url(#${headId})`} />
+
+					{/* ---- 回流反馈线 ---- */}
+					<path class="fig-arrow fig-dashed" d="M774 297 L774 125" marker-end={`url(#${headId})`} />
+					<text class="fig-sub" x="782" y="215" text-anchor="start">失败样本回流</text>
+				</>
+			) : (
+				<>
+					<rect class="fig-band" x="56" y="26" width="868" height="150" rx="10" />
+					<rect class="fig-band" x="56" y="196" width="868" height="140" rx="10" />
+
+					<text class="fig-stage" transform="translate(34,101) rotate(-90)" text-anchor="middle">
+						① 定位与干预
+					</text>
+					<text class="fig-stage" transform="translate(34,266) rotate(-90)" text-anchor="middle">
+						② 训练与评测
+					</text>
+
+					<rect class="fig-box" x="86" y="68" width="180" height="66" rx="8" />
+					<text class="fig-title" x="176" y="95" text-anchor="middle">失败样本池</text>
+					<text class="fig-sub" x="176" y="113" text-anchor="middle">多模态问答错误</text>
+
+					<rect class="fig-box" x="330" y="44" width="250" height="62" rx="8" />
+					<text class="fig-title" x="455" y="69" text-anchor="middle">① 学科规则缺位</text>
+					<text class="fig-sub" x="455" y="87" text-anchor="middle">不套用物理 / 化学规则，图看得见却算不对</text>
+
+					<rect class="fig-box" x="330" y="118" width="250" height="62" rx="8" />
+					<text class="fig-title" x="455" y="143" text-anchor="middle">② 视觉证据失效</text>
+					<text class="fig-sub" x="455" y="161" text-anchor="middle">图没看清 → 退化成语言先验答题</text>
+
+					<rect class="fig-box-accent" x="640" y="44" width="250" height="62" rx="8" />
+					<text class="fig-title" x="765" y="69" text-anchor="middle">规则显式化</text>
+					<text class="fig-sub" x="765" y="87" text-anchor="middle">可逐项判定的奖励项</text>
+
+					<rect class="fig-box-accent" x="640" y="118" width="250" height="62" rx="8" />
+					<text class="fig-title" x="765" y="143" text-anchor="middle">视觉依赖对照</text>
+					<text class="fig-sub" x="765" y="161" text-anchor="middle">遮图 / 换图 / 反事实样本</text>
+
+					<path class="fig-arrow" d="M266 101 L322 75" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M266 101 L322 149" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M580 75 L632 75" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M580 149 L632 149" marker-end={`url(#${headId})`} />
+
+					<rect class="fig-box" x="86" y="234" width="230" height="66" rx="8" />
+					<text class="fig-title" x="201" y="261" text-anchor="middle">多模态 RL 对齐</text>
+					<text class="fig-sub" x="201" y="279" text-anchor="middle">文心多模态基座 · 分线配置数据配比</text>
+
+					<rect class="fig-box" x="360" y="234" width="250" height="66" rx="8" />
+					<text class="fig-title" x="485" y="261" text-anchor="middle">内部评测</text>
+					<text class="fig-sub" x="485" y="279" text-anchor="middle">like56 视觉依赖 · stem200 学科推理</text>
+
+					<rect class="fig-box" x="654" y="234" width="230" height="66" rx="8" />
+					<text class="fig-title" x="769" y="261" text-anchor="middle">分析与回流</text>
+					<text class="fig-sub" x="769" y="279" text-anchor="middle">定下一轮数据与奖励的调整</text>
+
+					<path class="fig-arrow" d="M316 267 L352 267" marker-end={`url(#${headId})`} />
+					<path class="fig-arrow" d="M610 267 L646 267" marker-end={`url(#${headId})`} />
+
+					<path class="fig-arrow fig-dashed" d="M769 234 L769 180" marker-end={`url(#${headId})`} />
+					<text class="fig-sub" x="779" y="210" text-anchor="start">回流</text>
+				</>
+			)
+		}
+	</svg>
+
+	<figcaption class="fig-caption">
+		<span class="fig-label">Figure {index}</span>
+		{caption}
+	</figcaption>
+</figure>
+
+<style>
+	.fig {
+		margin: 1.25rem 0 0 0;
+	}
+
+	.fig-svg {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.fig-band {
+		fill: var(--color-surface);
+		stroke: var(--color-border);
+		stroke-dasharray: 5 4;
+	}
+
+	.fig-box {
+		fill: var(--color-bg);
+		stroke: var(--color-border);
+	}
+
+	.fig-box-accent {
+		fill: var(--color-accent-surface);
+		stroke: var(--color-accent);
+	}
+
+	.fig-arrow {
+		fill: none;
+		stroke: var(--color-text-dim);
+		stroke-width: 1.4;
+	}
+
+	.fig-dashed {
+		stroke-dasharray: 5 4;
+		stroke: var(--color-accent);
+	}
+
+	.fig-head {
+		fill: var(--color-text-dim);
+	}
+
+	.fig-svg text {
+		font-family: var(--font-sans);
+	}
+
+	.fig-title {
+		font-size: 13px;
+		font-weight: 600;
+		fill: var(--color-text-main);
+	}
+
+	.fig-sub {
+		font-size: 10.5px;
+		fill: var(--color-text-dim);
+	}
+
+	.fig-stage {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		fill: var(--color-text-dim);
+	}
+
+	.fig-caption {
+		margin-top: 0.6rem;
+		font-size: 0.8rem;
+		line-height: 1.7;
+		color: var(--color-text-muted);
+	}
+
+	.fig-label {
+		font-family: var(--font-mono);
+		font-weight: 700;
+		color: var(--color-text-main);
+		margin-right: 0.4rem;
+	}
+</style>
