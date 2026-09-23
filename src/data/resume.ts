@@ -180,6 +180,7 @@ export const PROJECTS: ResumeProject[] = [
 				rows: [
 					['Qwen2.5-Omni-7B · 1×', '66.5', '100.0'],
 					['Qwen2.5-Omni-7B · 3×', '48.5', '85.0'],
+					['SpeedOPD · Omni-7B · 3×（目标）', '66.0', '100.0'],
 				],
 			},
 		},
