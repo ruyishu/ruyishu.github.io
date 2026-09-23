@@ -875,11 +875,11 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 								<div class="paper-stage">
 									<div class="paper-stage-head">
 										<span class="paper-stage-index">03</span>
-										<h3>Results · 模型与 benchmark 对照</h3>
-										<span class="paper-stage-status">基线已实测 · Ours 为非实测占位</span>
+										<h3>Observation · 固定倍速基线</h3>
+										<span class="paper-stage-status">已观察</span>
 									</div>
 									<div class="result-table result-table--compact speedopd-results">
-										<h4 class="result-table-title">Table 1 · 固定倍速基线（实测）与 SpeedOPD 排版示意（非实测）</h4>
+										<h4 class="result-table-title">Table 1 · 不同倍速下的准确率</h4>
 										<table>
 											<thead>
 												<tr>{project.paperDraft.results.cols.map((col) => <th>{col}</th>)}</tr>

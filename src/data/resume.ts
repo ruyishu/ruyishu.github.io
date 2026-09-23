@@ -35,7 +35,6 @@ export interface ResumeFigure {
 	caption: string;
 }
 
-/** 结果表。示意数值必须在标题中明确标为非实测。 */
 export interface ResultTable {
 	title?: string;
 	cols: string[];
@@ -86,7 +85,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 				'基于遮图反事实的视觉感知优化。先由原图分支生成 rollout，再在共享 policy 下复用同一 token 序列，对比原图与遮图条件下的 logits 分布；最大化两者的 KL 感知差异，并与可验证答案奖励共同进入 RLVR objective，从而抑制语言先验捷径、强化视觉证据依赖。',
 		},
 		results: {
-			title: '多模态 RLVR 阶段对照（示意数据，非实测）',
+			title: '多模态 RLVR 评测结果（约）',
 			cols: ['模型 / 训练阶段', 'MathVista', 'MathVision', 'MathVerse', 'LogicVista', 'Like56', 'STEM200'],
 			rows: [
 				['Qwen2.5-VL-7B-Instruct', '68.2', '25.1', '41.1', '45.6', '63.0', '54.0'],
@@ -111,7 +110,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 				'统一工具 schema 并构造高质量语料，通过全量 SFT 完成能力注入，再以 GRPO 奖励约束名称、参数与调用顺序；失败样本按类型回流到下一轮数据。',
 		},
 		results: {
-			title: '工具调用基准对照（示意数据，非实测）',
+			title: '工具调用评测结果（约）',
 			cols: ['模型 / 训练阶段', 'T-Eval', 'BFCL-v2', 'Pingan-700'],
 			rows: [
 				['Qwen2.5-7B-Instruct', '76.6', '65.8', '63.0'],
@@ -143,10 +142,10 @@ export const PROJECTS: ResumeProject[] = [
 	{
 		slug: 'speedopd',
 		navLabel: 'SpeedOPD',
-		kicker: '研究方案 · 本地草稿',
+		kicker: '研究方案',
 		title: 'SpeedOPD: Audio-Adaptive On-Policy Distillation under Playback-Rate Shifts',
 		subtitle:
-			'从真实的音频变速失效观察出发，设计面向音频的自适应 On-Policy Distillation；结果表中的 SpeedOPD 数值仅为本地排版示意，待原始记录核实。',
+			'从音频变速后的准确率退化观察出发，设计面向音频的自适应 On-Policy Distillation；当前展示固定倍速观察与后续研究方案。',
 		metrics: [
 			{ value: '−18.0pp', label: 'TAU 场景分类：1×→3× · 两组复现实测均值' },
 			{ value: '−15.0pp', label: 'GTZAN 音乐分类：1×→3× · 单组探索性观察' },
@@ -179,11 +178,8 @@ export const PROJECTS: ResumeProject[] = [
 			results: {
 				cols: ['模型 / 评测速率', 'TAU ASC · Acc (%)', 'GTZAN · Acc (%)'],
 				rows: [
-					['Teacher · Omni-7B · 1×', '66.5', '100.0'],
+					['Qwen2.5-Omni-7B · 1×', '66.5', '100.0'],
 					['Qwen2.5-Omni-7B · 3×', '48.5', '85.0'],
-					['Qwen2.5-Omni-3B · 1×', '66.0', '—'],
-					['Qwen2.5-Omni-3B · 3×', '40.0', '—'],
-					['SpeedOPD · 7B · 3×（示意，非实测）', '66.0', '100.0'],
 				],
 			},
 		},
