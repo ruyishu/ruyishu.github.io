@@ -4,8 +4,10 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import PaperFigure from '../components/PaperFigure.astro';
-import { PAGE_ACCESS, SITE_TITLE } from '../consts';
-import { EDUCATION, EXPERIENCES, LINKS, PROFILE, PROJECTS, SKILLS } from '../data/resume';
+import LoopLlmStudy from '../components/LoopLlmStudy.astro';
+import AALeaderboard from '../components/AALeaderboard.astro';
+import { BENCH_URL, PAGE_ACCESS, SITE_TITLE } from '../consts';
+import { EDUCATION, EXPERIENCES, LINKS, PROFILE, PROJECTS } from '../data/resume';
 
 // 关闭时整个 deck 不参与构建输出，只留下锁页。
 const open = PAGE_ACCESS.about;
@@ -14,8 +16,7 @@ const slides = [
 	{ id: 'intro', label: '概览' },
 	{ id: 'experience', label: '经历' },
 	...PROJECTS.map((project) => ({ id: project.slug, label: project.navLabel })),
-	{ id: 'skills', label: '技能' },
-	{ id: 'contact', label: '联系' },
+	{ id: 'contact', label: '联系方式' },
 ];
 
 const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id === id) + 1).padStart(2, '0');
@@ -24,11 +25,11 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={`关于 · ${SITE_TITLE}`} description="如意鼠 · 大模型算法工程师：训练与后训练、蒸馏与评测、多模态推理" />
+		<BaseHead title={`关于 · ${SITE_TITLE}`} description="章坤 · 多模态大模型算法工程师：多模态、强化学习、On-Policy Distillation 与评测" />
 		<style>
 			main {
 				max-width: 62rem;
-				padding: 2rem 1.5rem 5rem 1.5rem;
+				padding: 1.25rem 1.5rem 4rem 1.5rem;
 			}
 
 			/* ---------- 顶部/底部演示控件 ---------- */
@@ -116,13 +117,13 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 
 			/* ---------- 幻灯片 ---------- */
 			.slide {
-				min-height: calc(100svh - 9rem);
 				display: flex;
 				flex-direction: column;
-				justify-content: center;
-				padding: 3.5rem 0;
+				padding: 1.4rem 0;
 				scroll-margin-top: 5rem;
 			}
+
+			#intro { padding-top: 0.5rem; }
 
 			.slide.is-visible > * {
 				animation: slide-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -149,24 +150,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 			}
 
 			/* ---------- 封面 ---------- */
-			.slide-eyebrow {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				font-family: var(--font-mono);
-				font-size: 0.78rem;
-				color: var(--color-text-dim);
-				margin-bottom: 1.5rem;
-			}
-
-			.live-dot {
-				width: 7px;
-				height: 7px;
-				border-radius: 50%;
-				background: #10b981;
-				box-shadow: 0 0 6px #10b981;
-			}
-
 			.hero-name {
 				font-size: 4rem;
 				font-weight: 800;
@@ -182,16 +165,33 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				letter-spacing: -0.01em;
 			}
 
+			.hero-schools {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.55rem;
+				margin: 0 0 0.7rem;
+			}
+
+			.hero-school {
+				padding: 0.2rem 0.75rem;
+				border: 1px solid var(--color-border-subtle);
+				border-radius: 999px;
+				background: var(--color-surface);
+				font-size: 1.5rem;
+				font-weight: 500;
+				line-height: 1.4;
+			}
+
 			.hero-tagline {
 				margin: 0.65rem 0 0 0;
-				font-family: var(--font-mono);
-				font-size: 0.9rem;
+				font-size: 0.93rem;
+				font-weight: 500;
 				color: var(--color-accent);
 			}
 
 			.hero-bio {
 				max-width: 44rem;
-				margin-top: 1.75rem;
+				margin-top: 1rem;
 			}
 
 			.hero-bio p {
@@ -199,6 +199,8 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				color: var(--color-text-muted);
 				margin-bottom: 0.85rem;
 			}
+
+			.hero-bio p:last-child { margin-bottom: 0; }
 
 			/* ---------- 指标卡 ---------- */
 			.metric-grid {
@@ -264,11 +266,123 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				color: var(--color-text-dim);
 			}
 
+			.slide-tag-link { text-decoration: none; }
+			.slide-tag-link:hover { color: var(--color-accent); }
+
 			.slide-sub {
 				max-width: 48rem;
 				font-size: 0.98rem;
 				color: var(--color-text-muted);
 				margin-bottom: 1.25rem;
+			}
+
+			.paper-draft {
+				display: flex;
+				flex-direction: column;
+				gap: 1.7rem;
+				margin-top: 0.3rem;
+			}
+
+			.paper-stage {
+				padding-top: 1.1rem;
+				border-top: 1px solid var(--color-border);
+			}
+
+			.paper-stage-head {
+				display: flex;
+				align-items: baseline;
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				margin-bottom: 0.85rem;
+			}
+
+			.paper-stage-head h3 {
+				margin: 0;
+				font-size: 1.12rem;
+				color: var(--color-text-main);
+			}
+
+			.paper-stage-index,
+			.paper-stage-status {
+				font-family: var(--font-mono);
+				font-size: 0.72rem;
+				color: var(--color-accent);
+			}
+
+			.paper-stage-status {
+				margin-left: auto;
+			}
+
+			.paper-copy p,
+			.paper-item p {
+				margin: 0 0 0.75rem;
+				font-size: 0.9rem;
+				line-height: 1.75;
+				color: var(--color-text-muted);
+			}
+
+			.paper-copy p:last-child,
+			.paper-item p:last-child {
+				margin-bottom: 0;
+			}
+
+			.paper-items {
+				display: flex;
+				flex-direction: column;
+				gap: 0.85rem;
+			}
+
+			.paper-item {
+				display: grid;
+				grid-template-columns: minmax(11rem, 0.8fr) minmax(0, 2fr);
+				gap: 1.1rem;
+				padding: 0.9rem 1rem;
+				border: 1px solid var(--color-border);
+				border-radius: 8px;
+				background: var(--color-surface);
+			}
+
+			.paper-item h4 {
+				margin: 0;
+				font-size: 0.88rem;
+				line-height: 1.5;
+				color: var(--color-text-main);
+			}
+
+			.paper-objective,
+			.paper-draft-note {
+				margin: 0.95rem 0 0;
+				padding: 0.85rem 1rem;
+				border-left: 2px solid var(--color-accent);
+				background: var(--color-surface);
+				font-size: 0.82rem;
+				line-height: 1.7;
+				color: var(--color-text-muted);
+			}
+
+			.paper-draft-note {
+				margin-top: 0;
+			}
+
+			.speedopd-figure {
+				margin: 1.1rem 0 1.35rem;
+				padding: 0.85rem;
+				border: 1px solid var(--color-border);
+				border-radius: 10px;
+				background: #fff;
+			}
+
+			.speedopd-figure img {
+				display: block;
+				width: 100%;
+				height: auto;
+			}
+
+			.speedopd-figure figcaption {
+				margin: 0.75rem 0.2rem 0.15rem;
+				font-size: 0.8rem;
+				line-height: 1.7;
+				color: var(--color-text-muted);
 			}
 
 			/* ---------- 时间线 ---------- */
@@ -278,22 +392,30 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 			}
 
 			.tl-item {
-				display: grid;
-				grid-template-columns: 9rem 1fr;
-				gap: 1.5rem;
-				padding: 1.25rem 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.45rem;
+				padding: 1.15rem 0;
 				border-bottom: 1px dashed var(--color-border);
 			}
 
+			.tl-heading {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 0.2rem 1rem;
+			}
+
 			.tl-period {
-				font-family: var(--font-mono);
-				font-size: 0.78rem;
+				margin-left: auto;
+				font-size: 0.8rem;
 				color: var(--color-text-dim);
-				padding-top: 0.2rem;
+				white-space: nowrap;
 			}
 
 			.tl-body h3 {
-				margin: 0 0 0.2rem 0;
+				margin: 0;
 				font-size: 1.05rem;
 			}
 
@@ -342,12 +464,11 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 			}
 
 			.tag {
-				font-family: var(--font-mono);
-				font-size: 0.7rem;
-				padding: 0.15rem 0.5rem;
+				font-size: 0.72rem;
+				padding: 0.18rem 0.55rem;
 				border: 1px solid var(--color-border);
 				border-radius: 999px;
-				color: var(--color-text-dim);
+				color: var(--color-text-muted);
 				background: var(--color-surface);
 			}
 
@@ -375,160 +496,121 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				}
 			}
 
-			/* ---------- 教育 ---------- */
-			.edu-row {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.75rem;
-				margin-top: 1.5rem;
-			}
-
-			.edu-card {
-				flex: 1 1 14rem;
-				border: 1px solid var(--color-border);
-				border-radius: 8px;
-				padding: 0.9rem 1rem;
-				background: var(--color-surface);
-				display: flex;
-				flex-direction: column;
-				gap: 0.2rem;
-			}
-
-			.edu-school {
-				font-weight: 700;
-				font-size: 1rem;
-			}
-
-			.edu-degree {
-				font-size: 0.82rem;
-				color: var(--color-text-muted);
-			}
-
-			/* ---------- 技能 ---------- */
-			.skill-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-				gap: 0.75rem;
-			}
-
-			.skill-card {
-				border: 1px solid var(--color-border);
-				border-radius: 8px;
-				padding: 1rem 1.1rem;
-				background: var(--color-surface);
-			}
-
-			.skill-card h3 {
-				font-family: var(--font-mono);
-				font-size: 0.76rem;
-				text-transform: uppercase;
-				letter-spacing: 0.06em;
-				color: var(--color-text-dim);
-				margin: 0 0 0.6rem 0;
-			}
-
-			.skill-card ul {
-				margin: 0;
-				padding: 0;
-				list-style: none;
-				display: flex;
-				flex-direction: column;
-				gap: 0.3rem;
-			}
-
-			.skill-card li {
-				font-size: 0.86rem;
-				line-height: 1.6;
-				color: var(--color-text-muted);
-			}
-
 			/* ---------- 联系 ---------- */
 			.contact-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-				gap: 0.75rem;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 0.8rem;
 			}
 
 			.contact-card {
 				border: 1px solid var(--color-border);
-				border-radius: 8px;
-				padding: 1rem 1.1rem;
-				background: var(--color-surface);
+				border-radius: 14px;
+				padding: 0.85rem 1.1rem;
+				background: var(--color-bg);
 				text-decoration: none;
 				display: flex;
 				flex-direction: column;
-				gap: 0.25rem;
-				transition: border-color 0.15s ease, transform 0.15s ease;
+				align-items: flex-start;
+				gap: 0.18rem;
+				min-width: 0;
+				transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
 			}
 
-			.contact-card:hover {
+			.contact-card:hover,
+			.contact-card:focus-visible {
 				border-color: var(--color-accent);
+				background: var(--color-surface);
 				transform: translateY(-2px);
 				text-decoration: none;
 			}
 
 			.contact-label {
-				font-family: var(--font-mono);
-				font-size: 0.72rem;
-				text-transform: uppercase;
-				letter-spacing: 0.06em;
-				color: var(--color-text-dim);
+				font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+				font-size: 0.75rem;
+				font-weight: 500;
+				color: var(--color-text-muted);
 			}
 
 			.contact-value {
-				font-size: 0.92rem;
+				font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+				font-size: 0.98rem;
 				color: var(--color-text-main);
-				font-weight: 600;
+				font-weight: 500;
+				line-height: 1.45;
+				letter-spacing: 0;
+				overflow-wrap: anywhere;
 			}
 
-			.closing {
-				margin-top: 2rem;
-				font-size: 0.9rem;
-				color: var(--color-text-dim);
-			}
-
-			/* ---------- 论文图 + 结果表（横跨「时间 + 正文」两列） ---------- */
-			.tl-item > .exp-extra {
-				grid-column: 1 / -1;
+			/* ---------- 论文图 + 结果表 ---------- */
+			.exp-extra {
+				min-width: 0;
+				margin-top: 0.25rem;
 			}
 
 			.result-table {
-				margin-top: 1.25rem;
+				margin-top: 1rem;
+				overflow-x: auto;
+			}
+
+			.result-table-title {
+				font-size: 0.9rem;
+				font-weight: 650;
+				color: var(--color-text-main);
+				margin: 0 0 0.4rem;
 			}
 
 			.result-table table {
 				width: 100%;
+				min-width: 46rem;
 				border-collapse: collapse;
 				font-size: 0.84rem;
 				margin: 0;
 			}
 
+			.result-table--compact table {
+				min-width: 34rem;
+			}
+
 			.result-table th {
-				font-family: var(--font-mono);
-				font-size: 0.7rem;
+				font-size: 0.73rem;
 				font-weight: 600;
 				color: var(--color-text-dim);
-				text-align: left;
-				padding: 0.4rem 0.6rem 0.4rem 0;
+				background: var(--color-surface);
+				text-align: right;
+				white-space: nowrap;
+				padding: 0.6rem 0.7rem;
 				border-bottom: 1px solid var(--color-border);
 			}
 
 			.result-table td {
-				padding: 0.45rem 0.6rem 0.45rem 0;
+				padding: 0.65rem 0.7rem;
 				border-bottom: 1px dashed var(--color-border);
 				font-size: 0.84rem;
 				color: var(--color-text-muted);
+				text-align: right;
+				white-space: nowrap;
 			}
 
+			.result-table th:first-child,
 			.result-table td:first-child {
+				text-align: left;
 				color: var(--color-text-main);
 				font-weight: 500;
 			}
 
-			.result-table td:nth-child(n + 3) {
-				font-family: var(--font-mono);
+			.result-table td:not(:first-child) {
+				font-variant-numeric: tabular-nums;
+			}
+
+			.result-table tbody tr:last-child td:not(:first-child) {
+				color: var(--color-accent);
+				font-weight: 650;
+			}
+
+			.speedopd-results tbody tr:last-child td:not(:first-child) {
 				color: var(--color-text-dim);
-				width: 5.5rem;
+				font-weight: 500;
 			}
 
 			/* ---------- 响应式 ---------- */
@@ -542,14 +624,23 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				}
 			}
 
+			@media (max-width: 850px) {
+				.contact-grid { grid-template-columns: 1fr; }
+			}
+
 			@media (max-width: 640px) {
 				main {
 					padding: 1.5rem 1.1rem 4rem 1.1rem;
 				}
 
+				.paper-item {
+					grid-template-columns: 1fr;
+					gap: 0.35rem;
+				}
+
 				.slide {
 					min-height: auto;
-					padding: 2.5rem 0;
+					padding: 1.4rem 0;
 				}
 
 				.hero-name {
@@ -560,9 +651,11 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 					font-size: 1.2rem;
 				}
 
-				.tl-item {
-					grid-template-columns: 1fr;
-					gap: 0.5rem;
+				.hero-school { font-size: 1.2rem; }
+				.contact-grid { grid-template-columns: 1fr; }
+
+				.result-table table {
+					min-width: 43rem;
 				}
 			}
 
@@ -591,9 +684,8 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				}
 
 				.metric-card,
-				.skill-card,
 				.contact-card,
-				.edu-card {
+				.hero-school {
 					break-inside: avoid;
 				}
 			}
@@ -628,12 +720,10 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				<>
 			<!-- 封面 -->
 			<section class="slide is-visible" id="intro">
-				<div class="slide-eyebrow">
-					<span class="live-dot"></span>
-					<span>ruyishu@lab:~$ whoami</span>
-				</div>
-
 				<h1 class="hero-name">{PROFILE.name}</h1>
+				<div class="hero-schools">
+					{EDUCATION.map((education) => <span class="hero-school">{education.school} · {education.degree}</span>)}
+				</div>
 				<div class="hero-role">{PROFILE.role}</div>
 				<div class="hero-tagline">{PROFILE.tagline}</div>
 
@@ -654,12 +744,14 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 					{
 						EXPERIENCES.map((experience, index) => (
 							<article class="tl-item">
-								<div class="tl-period">
-									{experience.period}
-									{experience.needsInput && <span class="todo-chip">时间待补充</span>}
-								</div>
 								<div class="tl-body">
-									<h3>{experience.org}</h3>
+									<div class="tl-heading">
+										<h3>{experience.org}</h3>
+										<div class="tl-period">
+											{experience.period}
+											{experience.needsInput && <span class="todo-chip">时间待补充</span>}
+										</div>
+									</div>
 									<div class="tl-role">{experience.role}</div>
 									<ul class="bullet-list">
 										{experience.bullets.map((bullet) => (
@@ -687,7 +779,8 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 										)}
 
 										{experience.results && (
-											<div class="result-table">
+											<div class={experience.figure?.kind === 'tooluse' ? 'result-table result-table--compact' : 'result-table'}>
+												{experience.results.title && <h4 class="result-table-title">{experience.results.title}</h4>}
 												<table>
 													<thead>
 														<tr>
@@ -715,20 +808,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 					}
 				</div>
 
-				<div class="edu-row">
-					{
-						EDUCATION.map((education) => (
-							<div class="edu-card">
-								<span class="edu-school">{education.school}</span>
-								<span class="edu-degree">
-									{education.degree}
-									{education.period && ` · ${education.period}`}
-									{education.needsInput && <span class="todo-chip">年份待补充</span>}
-								</span>
-							</div>
-						))
-					}
-				</div>
 			</section>
 
 			<!-- 项目 -->
@@ -738,39 +817,111 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 						<div class="slide-head">
 							<span class="slide-index">{slideNumber(project.slug)}</span>
 							<h2>{project.title}</h2>
-							<span class="slide-tag">{project.kicker}</span>
+							{project.slug === 'bench' ? <a class="slide-tag slide-tag-link" href={BENCH_URL}>数据来源 ↗</a> : <span class="slide-tag">{project.kicker}</span>}
 						</div>
 
-						<p class="slide-sub">
-							{project.subtitle} {project.needsInput && <span class="todo-chip">待补充</span>}
-						</p>
+						{project.slug !== 'bench' && <p class="slide-sub">{project.subtitle} {project.needsInput && <span class="todo-chip">待补充</span>}</p>}
 
-						{project.metrics && (
-							<div class="metric-grid">
-								{project.metrics.map((metric) => (
-									<div class="metric-card">
-										<span class="metric-value">{metric.value}</span>
-										<span class="metric-label">{metric.label}</span>
+						{project.slug === 'loopllm' ? (
+							<LoopLlmStudy />
+						) : project.slug === 'bench' ? (
+							<AALeaderboard />
+						) : project.paperDraft ? (
+							<div class="paper-draft">
+								<div class="paper-stage">
+									<div class="paper-stage-head">
+										<span class="paper-stage-index">01</span>
+										<h3>Motivation · 音频加速后的准确率退化</h3>
+										<span class="paper-stage-status">已观察</span>
 									</div>
-								))}
+									<div class="paper-copy">
+										{project.paperDraft.motivation.map((paragraph) => <p>{paragraph}</p>)}
+									</div>
+									<figure class="speedopd-figure">
+										<img src="/images/about/speedopd-motivation.svg?v=3" alt="Qwen2.5-Omni-7B 的实测固定倍速准确率：TAU 1 倍速 66.5%、2 倍速 57.0%、3 倍速 48.5%；GTZAN 分别为 100.0%、95.0%、85.0%。" loading="lazy" />
+										<figcaption>Figure 1 · 加速退化的两个观察：TAU 为每组 200 条的两组 seed 均值；GTZAN 为 60 条的单组探索结果，3× 差异经 Holm 校正后未达显著性（p=0.113）。</figcaption>
+									</figure>
+									{project.metrics && (
+										<div class="metric-grid">
+											{project.metrics.map((metric) => (
+												<div class="metric-card">
+													<span class="metric-value">{metric.value}</span>
+													<span class="metric-label">{metric.label}</span>
+												</div>
+											))}
+										</div>
+									)}
+								</div>
+								<div class="paper-stage">
+									<div class="paper-stage-head">
+										<span class="paper-stage-index">02</span>
+										<h3>Method · Audio-Adaptive Cross-Rate OPD</h3>
+										<span class="paper-stage-status">拟议方案</span>
+									</div>
+									<figure class="speedopd-figure">
+										<img src="/images/about/speedopd-method.png" alt="拟议方法：1 倍速原音频交给冻结教师，变速音频交给学生；学生产生回答前缀并提供共同上下文，教师和学生 logits 进入自适应门控 KL，结合答案监督与原速率保持损失训练。" loading="lazy" />
+										<figcaption>Figure 2 · 拟议的 Audio-Adaptive Cross-Rate OPD。教师读取原音频、学生读取变速音频，并在学生生成的同一前缀上比较分布；这是方法设计，不是已验证的训练流程。</figcaption>
+									</figure>
+									<div class="paper-items">
+										{project.paperDraft.method.map((item) => (
+											<div class="paper-item">
+												<h4>{item.name}</h4>
+												<p>{item.detail}</p>
+											</div>
+										))}
+									</div>
+									<p class="paper-objective">{project.paperDraft.objective}</p>
+								</div>
+								<div class="paper-stage">
+									<div class="paper-stage-head">
+										<span class="paper-stage-index">03</span>
+										<h3>Results · 模型与 benchmark 对照</h3>
+										<span class="paper-stage-status">基线已实测 · Ours 为非实测占位</span>
+									</div>
+									<div class="result-table result-table--compact speedopd-results">
+										<h4 class="result-table-title">Table 1 · 固定倍速基线（实测）与 SpeedOPD 排版示意（非实测）</h4>
+										<table>
+											<thead>
+												<tr>{project.paperDraft.results.cols.map((col) => <th>{col}</th>)}</tr>
+											</thead>
+											<tbody>
+												{project.paperDraft.results.rows.map((row) => (
+													<tr>{row.map((cell) => <td>{cell}</td>)}</tr>
+												))}
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						) : (
+							<>
+								{project.metrics && (
+									<div class="metric-grid">
+										{project.metrics.map((metric) => (
+											<div class="metric-card">
+												<span class="metric-value">{metric.value}</span>
+												<span class="metric-label">{metric.label}</span>
+											</div>
+										))}
+									</div>
+								)}
+								<ul class="bullet-list" style="margin-top: 1.5rem;">
+									{project.bullets.map((bullet) => (
+										<li>{bullet}</li>
+									))}
+								</ul>
+							</>
+						)}
+
+						{!project.paperDraft && (
+							<div class="tag-row">
+								{project.tags.map((tag) => <span class="tag">{tag}</span>)}
 							</div>
 						)}
 
-						<ul class="bullet-list" style="margin-top: 1.5rem;">
-							{project.bullets.map((bullet) => (
-								<li>{bullet}</li>
-							))}
-						</ul>
-
-						<div class="tag-row">
-							{project.tags.map((tag) => (
-								<span class="tag">{tag}</span>
-							))}
-						</div>
-
 						{project.link && (
 							<div class="tag-row">
-								<a href={project.link.href} target="_blank" rel="noopener noreferrer" style="font-family: var(--font-mono); font-size: 0.85rem;">
+								<a href={project.link.href} target="_blank" rel="noopener noreferrer" style="font-size: 0.85rem; font-weight: 600;">
 									{project.link.label} →
 								</a>
 							</div>
@@ -779,35 +930,11 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				))
 			}
 
-			<!-- 技能 -->
-			<section class="slide" id="skills">
-				<div class="slide-head">
-					<span class="slide-index">{slideNumber('skills')}</span>
-					<h2>技能</h2>
-					<span class="slide-tag">Toolbox</span>
-				</div>
-
-				<div class="skill-grid">
-					{
-						SKILLS.map((skill) => (
-							<div class="skill-card">
-								<h3>{skill.group}</h3>
-								<ul>
-									{skill.items.map((item) => (
-										<li>{item}</li>
-									))}
-								</ul>
-							</div>
-						))
-					}
-				</div>
-			</section>
-
 			<!-- 联系 -->
 			<section class="slide" id="contact">
 				<div class="slide-head">
 					<span class="slide-index">{slideNumber('contact')}</span>
-					<h2>联系</h2>
+					<h2>联系方式</h2>
 					<span class="slide-tag">Contact</span>
 				</div>
 
@@ -821,10 +948,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 						))
 					}
 				</div>
-
-				<p class="closing">
-					博客里还有 <a href="/blog">43 篇论文阅读与技术复盘</a>，以及按分类归档的<a href="/workbench">工作台</a>。
-				</p>
 			</section>
 		</>
 			) : (
@@ -871,7 +994,7 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				/* 键盘翻页：上下/左右/空格/PageUp·PageDown/Home·End/数字直达 */
 				window.addEventListener('keydown', (event) => {
 					const tag = (event.target as HTMLElement | null)?.tagName;
-					if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+					if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'SUMMARY') return;
 
 					const next = ['ArrowDown', 'ArrowRight', 'PageDown', ' '];
 					const prev = ['ArrowUp', 'ArrowLeft', 'PageUp'];

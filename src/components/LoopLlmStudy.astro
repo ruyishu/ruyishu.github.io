@@ -1,0 +1,156 @@
+---
+const toolUse = [
+	{ name: 'mini 数据', t1: 6, t4: 10, x1: 168, x4: 230 },
+	{ name: '完整数据', t1: 7, t4: 13, x1: 422, x4: 484 },
+];
+
+const lossRows = [
+	{ stage: '预训练 · mini', steps: '39,695', t1: '1.6496', t4: '1.5853', change: '−3.9%' },
+	{ stage: '预训练 · 完整', steps: '264,651', t1: '1.6433', t4: '1.5898', change: '−3.3%' },
+	{ stage: 'SFT · 完整', steps: '319,340', t1: '1.4955', t4: '1.3895', change: '−7.1%' },
+];
+---
+
+<div class="loop-study">
+	<section class="loop-section" aria-labelledby="loop-intro">
+		<div class="loop-heading"><span>01</span><h3 id="loop-intro">项目介绍</h3></div>
+		<p>
+			loopllm 是基于 MiniMind 的个人开源复现实验。它要回答的问题很直接：<strong>不砍掉原本的 8 层，只让同一组 Transformer 层重复执行 4 遍，多花的计算能否换来更好的模型表现？</strong>
+			项目保留 MiniMind 的训练链路，增加循环次数开关，并用预训练、SFT 和数学工具调用评测检验效果。
+		</p>
+		<div class="loop-facts" aria-label="项目基本信息">
+			<span><b>基座</b> MiniMind · 8 层 / d768</span>
+			<span><b>参数</b> 两组均约 63.91M</span>
+			<span><b>变量</b> 循环次数 T=1 / T=4</span>
+		</div>
+	</section>
+
+	<section class="loop-section" aria-labelledby="loop-design">
+		<div class="loop-heading"><span>02</span><h3 id="loop-design">项目实验设计</h3></div>
+		<p>
+			每组 A/B 都使用相同的模型宽度、数据和预训练 / SFT 配置；T=1 运行原版 8 层，T=4 共享权重、把这 8 层循环 4 遍。
+			分别跑 mini 与完整数据档，比较同步训练步数下的 loss，再用同一套 20 题数学 ToolUse 测最终答案正确率。
+		</p>
+		<figure class="loop-figure loop-architecture">
+			<a href="/images/about/loopllm-architecture-v2.png" target="_blank" rel="noopener noreferrer" aria-label="放大查看 T=1 与 T=4 的模型结构对照图">
+				<img src="/images/about/loopllm-architecture-v2.png" alt="左侧 T=1：输入顺序经过 8 层后输出；右侧 T=4：同一组 8 层权重重复执行 4 次，循环箭头回到层栈顶部，第四次后输出。" loading="lazy" />
+			</a>
+			<figcaption>Figure 1 · 核心区别是复用同一组 8 层权重，而不是堆出 32 个独立层。右侧每轮还使用残差门控；第 2–4 轮重注入初始输入。图为机制示意，点击可放大。</figcaption>
+		</figure>
+		<div class="loop-table-wrap">
+			<table class="loop-table loop-design-table">
+				<thead><tr><th>对照条件</th><th>T=1 · 原版</th><th>T=4 · loopllm</th></tr></thead>
+				<tbody>
+					<tr><th>模型主体</th><td>8 层，约 63.91M</td><td>同一组 8 层权重循环 4 遍</td></tr>
+					<tr><th>训练数据与配置</th><td colspan="2">同一数据档内保持一致，按同步步数对照</td></tr>
+					<tr><th>实现差异</th><td>原版前向</td><td>循环门控、输入重注入；循环时关闭 KV cache</td></tr>
+					<tr><th>下游评测</th><td colspan="2">自建 20 题数学 ToolUse · math_only（只开放计算器）</td></tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="loop-fine">T=4 仅额外引入每轮门控标量；“参数量相同”指以百万参数为单位的近似值，不代表严格零新增参数。</p>
+	</section>
+
+	<section class="loop-section" aria-labelledby="loop-results">
+		<div class="loop-heading"><span>03</span><h3 id="loop-results">项目结果</h3></div>
+		<p>最直观的变化在数学工具调用：mini 档答对数从 6/20 到 10/20，完整档从 7/20 到 13/20。下图只比较 SFT 权重、相同题目与相同工具设置。</p>
+		<figure class="loop-figure">
+			<svg viewBox="0 0 680 300" role="img" aria-labelledby="loop-chart-title loop-chart-desc">
+				<title id="loop-chart-title">T=1 与 T=4 的数学 ToolUse 正确率对比</title>
+				<desc id="loop-chart-desc">mini 数据 T=1 为 30%，T=4 为 50%；完整数据 T=1 为 35%，T=4 为 65%。均为 20 题 math_only 评测。</desc>
+				<text x="28" y="27" class="chart-title">数学 ToolUse · 最终答案正确率</text>
+				<rect x="425" y="16" width="13" height="13" rx="2" class="bar-base"/><text x="444" y="27" class="chart-legend">T=1</text>
+				<rect x="501" y="16" width="13" height="13" rx="2" class="bar-loop"/><text x="520" y="27" class="chart-legend">T=4</text>
+				<line x1="68" y1="232" x2="642" y2="232" class="chart-axis"/>
+				{[0, 20, 40, 60, 80].map((tick) => (
+					<g>
+						<line x1="68" y1={232 - tick * 2} x2="642" y2={232 - tick * 2} class="chart-grid" />
+						<text x="57" y={236 - tick * 2} text-anchor="end" class="chart-tick">{tick}</text>
+						</g>
+				))}
+				{toolUse.map((group) => (
+					<g>
+						<rect x={group.x1} y={232 - group.t1 * 10} width="48" height={group.t1 * 10} rx="3" class="bar-base" />
+						<rect x={group.x4} y={232 - group.t4 * 10} width="48" height={group.t4 * 10} rx="3" class="bar-loop" />
+						<text x={group.x1 + 24} y={222 - group.t1 * 10} text-anchor="middle" class="chart-value">{group.t1 * 5}%</text>
+						<text x={group.x4 + 24} y={222 - group.t4 * 10} text-anchor="middle" class="chart-value chart-value-loop">{group.t4 * 5}%</text>
+						<text x={(group.x1 + group.x4 + 48) / 2} y="258" text-anchor="middle" class="chart-group">{group.name}</text>
+					</g>
+				))}
+				<text x="24" y="151" transform="rotate(-90 24 151)" class="chart-axis-label">准确率 (%)</text>
+			</svg>
+			<figcaption>Figure 2 · SFT 后的数学工具调用对照。mini：6/20 → 10/20（+20pp）；完整：7/20 → 13/20（+30pp）。20 题为自建评测，不是通用能力榜单。</figcaption>
+		</figure>
+		<details class="loop-more-results">
+			<summary>展开技术报告中的完整四臂、五阶段对照图</summary>
+			<figure class="loop-figure loop-report-figure">
+				<div class="loop-figure-scroll"><img src="/images/about/loopllm-report-fig8.png" alt="Mini 与完整数据两档中 T=1 和 T=4 在预训练、SFT、DPO、GRPO、Agent 阶段的 20 题数学工具调用正确率对照。" loading="lazy" /></div>
+				<figcaption>原技术报告 Figure 8。DPO / GRPO / Agent 的柱高不代表 RL 带来了额外收益：T=4 的 RL 预算未跑满，且 RL 超参未能与 T=1 对齐。</figcaption>
+			</figure>
+		</details>
+		<div class="loop-table-wrap">
+			<table class="loop-table loop-loss-table">
+				<caption>预训练与 SFT 的终态 loss</caption>
+				<thead><tr><th>阶段 / 数据</th><th>同步步数</th><th>T=1</th><th>T=4</th><th>变化</th></tr></thead>
+				<tbody>{lossRows.map((row) => <tr><th>{row.stage}</th><td>{row.steps}</td><td>{row.t1}</td><td>{row.t4}</td><td class="loop-better">{row.change}</td></tr>)}</tbody>
+			</table>
+		</div>
+		<figure class="loop-figure loop-report-figure">
+			<a href="/images/about/loopllm-report-fig2.png" target="_blank" rel="noopener noreferrer" aria-label="放大查看 mini 档预训练 loss 曲线">
+				<img src="/images/about/loopllm-report-fig2.png" alt="mini 数据档 T=1 与 T=4 的预训练 loss 曲线：六个同步步数采样点上 T=4 均更低，终态为 1.6496 对 1.5853。" loading="lazy" />
+			</a>
+			<figcaption>Figure 3 · 复用技术报告 Figure 2：mini 档预训练的六个同步步数采样点。终态 loss 1.6496 → 1.5853；曲线未展示每一步的原始记录，点击可放大。</figcaption>
+		</figure>
+		<p class="loop-cost"><strong>收益有代价：</strong>完整档 SFT 步速从 8.08 降到 2.29 步/秒，约 3.5× 每步训练耗时；循环实现也不省显存。</p>
+		<p class="loop-fine">结论仅覆盖约 64M 模型和 20 题单一任务；尚无等算力对照。T=4 的 RL 训练预算未跑满，因此这里不把后续 RL 阶段的分数当作额外增益。</p>
+	</section>
+	<p class="loop-source">数据与实验口径：<a href="https://github.com/ruyishu/loopllm/blob/main/docs/%E6%8A%80%E6%9C%AF%E6%8A%A5%E5%91%8A.md" target="_blank" rel="noopener noreferrer">loopllm 技术报告 ↗</a></p>
+</div>
+
+<style>
+	.loop-study { display: grid; width: 100%; min-width: 0; gap: 1.8rem; margin-top: 0.15rem; }
+	.loop-section { min-width: 0; border-top: 1px solid var(--color-border); padding-top: 1.15rem; }
+	.loop-heading { display: flex; align-items: baseline; gap: 0.72rem; margin-bottom: 0.65rem; }
+	.loop-heading span { font: 0.72rem var(--font-mono); color: var(--color-accent); }
+	.loop-heading h3 { margin: 0; font-size: 1.12rem; color: var(--color-text-main); }
+	.loop-section > p { margin: 0.45rem 0 0.9rem; font-size: 0.91rem; line-height: 1.75; color: var(--color-text-muted); }
+	.loop-section > p strong { color: var(--color-text-main); }
+	.loop-facts { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-top: 1rem; }
+	.loop-facts span { padding: 0.42rem 0.65rem; border: 1px solid var(--color-border); border-radius: 5px; background: var(--color-surface); font-size: 0.76rem; color: var(--color-text-muted); }
+	.loop-facts b { color: var(--color-accent); margin-right: 0.3rem; }
+	.loop-table-wrap { overflow-x: auto; margin-top: 0.95rem; }
+	.loop-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; line-height: 1.5; }
+	.loop-design-table { min-width: 36rem; }
+	.loop-loss-table { min-width: 32rem; }
+	.loop-table caption { padding: 0 0 0.45rem; text-align: left; font-weight: 650; color: var(--color-text-main); }
+	.loop-table thead th { padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--color-border); background: var(--color-surface); text-align: left; white-space: nowrap; color: var(--color-text-main); }
+	.loop-table tbody th, .loop-table tbody td { padding: 0.62rem 0.65rem; border-bottom: 1px dashed var(--color-border); text-align: left; color: var(--color-text-muted); }
+	.loop-table tbody th { font-weight: 600; white-space: nowrap; color: var(--color-text-main); }
+	.loop-loss-table td:not(:first-child), .loop-loss-table thead th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+	.loop-loss-table .loop-better { color: var(--color-accent); font-weight: 700; }
+	.loop-figure { min-width: 0; max-width: 100%; margin: 1.1rem 0 1.35rem; padding: 0.8rem; border: 1px solid var(--color-border); border-radius: 10px; background: #fff; }
+	.loop-figure svg { display: block; width: 100%; height: auto; }
+	.loop-figure a { display: block; width: 100%; }
+	.loop-figure img { display: block; width: 100%; max-width: 100%; height: auto; }
+	.loop-figure figcaption { margin: 0.75rem 0.2rem 0.15rem; font-size: 0.8rem; line-height: 1.7; color: var(--color-text-muted); }
+	.loop-architecture { margin-top: 1.1rem; }
+	.loop-more-results { min-width: 0; margin: -0.45rem 0 1.2rem; font-size: 0.78rem; color: var(--color-text-muted); }
+	.loop-more-results summary { cursor: pointer; color: var(--color-accent); }
+	.loop-more-results .loop-figure { margin: 0.75rem 0; }
+	.loop-figure-scroll { overflow-x: auto; }
+	.loop-figure-scroll img { min-width: 760px; }
+	.chart-title { font: 600 15px system-ui, sans-serif; fill: #1f2937; }
+	.chart-legend, .chart-group { font: 12px system-ui, sans-serif; fill: #3c4656; }
+	.chart-group { font-weight: 600; }
+	.chart-tick, .chart-axis-label { font: 11px system-ui, sans-serif; fill: #667085; }
+	.chart-axis { stroke: #8995a5; stroke-width: 1; }
+	.chart-grid { stroke: #e7eaf0; stroke-width: 1; }
+	.bar-base { fill: #aab3c1; }
+	.bar-loop { fill: #3972bb; }
+	.chart-value { font: 700 14px system-ui, sans-serif; fill: #404a57; }
+	.chart-value-loop { fill: #285a9e; }
+	.loop-section > .loop-cost { margin-top: 1rem; padding: 0.7rem 0.85rem; border-left: 2px solid var(--color-accent); background: var(--color-surface); }
+	.loop-section > .loop-fine { font-size: 0.76rem; line-height: 1.6; color: var(--color-text-dim); }
+	.loop-source { margin: -0.7rem 0 0; font-size: 0.78rem; color: var(--color-text-dim); }
+	@media (max-width: 500px) { .loop-figure { padding: 0.35rem; } .loop-figure figcaption { margin: 0.55rem; } }
+</style>

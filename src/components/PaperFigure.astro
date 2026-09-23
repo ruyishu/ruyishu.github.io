@@ -1,6 +1,6 @@
 ---
-// 论文风格的全流程示意图（手绘 SVG，非位图）。
-// kind: 'tooluse'（平安 · 工具调用闭环）/ 'mmrl'（百度 · 多模态 RL 两条问题线）
+// 论文风格的方法示意图。
+// kind: 'tooluse'（平安 · 工具调用闭环）/ 'mmrl'（百度 · 多模态 RLVR 视觉感知目标）
 interface Props {
 	kind: 'tooluse' | 'mmrl';
 	caption: string;
@@ -12,8 +12,41 @@ const headId = `fig-head-${kind}`;
 ---
 
 <figure class="fig">
+	{
+		kind === 'tooluse' && (
+			<picture>
+				<source media="(max-width: 800px)" srcset="/images/about/pingan-tooluse-pipeline-narrow.svg" />
+				<img
+					class="fig-raster"
+					src="/images/about/pingan-tooluse-pipeline.svg"
+					alt={caption}
+					width="1240"
+					height="540"
+					loading="lazy"
+					decoding="async"
+					style="display:block;width:100%;max-width:1080px;height:auto;margin-inline:auto;border-radius:8px;background:#fff;"
+				/>
+			</picture>
+		)
+	}
+	{
+		kind === 'mmrl' && (
+			<img
+				class="fig-raster"
+				src="/images/about/multimodal-rlvr-perception-objective-v3.png"
+				alt={caption}
+				width="2060"
+				height="763"
+				loading="lazy"
+				decoding="async"
+				style="display:block;width:100%;max-width:1080px;height:auto;margin-inline:auto;border:1px solid var(--color-border);border-radius:8px;background:#fff;"
+			/>
+		)
+	}
 	<svg
-		class="fig-svg"
+		class="fig-svg fig-svg--hidden"
+		hidden
+		aria-hidden="true"
 		viewBox={kind === 'tooluse' ? '0 0 960 400' : '0 0 960 380'}
 		role="img"
 		aria-label={caption}
@@ -57,7 +90,7 @@ const headId = `fig-head-${kind}`;
 
 					<rect class="fig-box" x="370" y="53" width="240" height="64" rx="8" />
 					<text class="fig-title" x="490" y="80" text-anchor="middle">样本构造</text>
-					<text class="fig-sub" x="490" y="98" text-anchor="middle">正例 · 参数扰动负例 · 多步链路 · 应拒答</text>
+					<text class="fig-sub" x="490" y="98" text-anchor="middle">真实业务场景 · 工具 schema · 调用样本</text>
 
 					<rect class="fig-box" x="654" y="53" width="240" height="64" rx="8" />
 					<text class="fig-title" x="774" y="80" text-anchor="middle">质量筛选</text>
@@ -161,13 +194,29 @@ const headId = `fig-head-${kind}`;
 
 <style>
 	.fig {
-		margin: 1.25rem 0 0 0;
+		margin: 1.1rem 0 1.35rem;
+		padding: 0.8rem;
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		background: var(--color-bg);
 	}
 
 	.fig-svg {
 		display: block;
 		width: 100%;
 		height: auto;
+	}
+
+	.fig-svg--hidden {
+		display: none;
+	}
+
+	.fig-raster {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 6px;
+		background: #fff;
 	}
 
 	.fig-band {
@@ -223,7 +272,7 @@ const headId = `fig-head-${kind}`;
 	}
 
 	.fig-caption {
-		margin-top: 0.6rem;
+		margin: 0.75rem 0.2rem 0.15rem;
 		font-size: 0.8rem;
 		line-height: 1.7;
 		color: var(--color-text-muted);

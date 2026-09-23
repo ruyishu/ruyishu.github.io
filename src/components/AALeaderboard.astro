@@ -1,0 +1,54 @@
+---
+import { AA_INDEX_VERSION, AA_ROWS, AA_SNAPSHOT_DATE } from '../data/aa-leaderboard';
+
+const visibleCount = 10;
+---
+
+<div class="aa-leaderboard" id="aa-leaderboard">
+	<div class="aa-table-wrap">
+		<table id="aa-model-table" aria-label="Artificial Analysis 当前模型能力榜单">
+			<thead>
+				<tr><th scope="col">模型 · 推理档位</th><th scope="col">AA Intelligence Index</th></tr>
+			</thead>
+			<tbody>
+				{AA_ROWS.map((row, index) => (
+					<tr hidden={index >= visibleCount}>
+						<td><span class="aa-rank">{String(index + 1).padStart(2, '0')}</span><span>{row.model}</span></td>
+						<td class="aa-score">{row.score}</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+	<button class="aa-toggle" type="button" aria-expanded="false" aria-controls="aa-model-table">View all <span>+{AA_ROWS.length - visibleCount}</span></button>
+	<p class="aa-note">AA Intelligence Index {AA_INDEX_VERSION} · {AA_ROWS.length} 个模型／推理档位 · {AA_SNAPSHOT_DATE} 快照 · * 为 AA 估算分数。<a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener noreferrer">AA 原榜单 ↗</a> 完整榜单公开转载前需确认许可。</p>
+</div>
+
+<script>
+	const root = document.getElementById('aa-leaderboard');
+	const button = root?.querySelector<HTMLButtonElement>('.aa-toggle');
+	const rows = Array.from(root?.querySelectorAll<HTMLTableRowElement>('tbody tr') ?? []);
+	button?.addEventListener('click', () => {
+		const expanded = button.getAttribute('aria-expanded') === 'true';
+		rows.slice(10).forEach((row) => { row.hidden = expanded; });
+		button.setAttribute('aria-expanded', String(!expanded));
+		button.innerHTML = expanded ? `View all <span>+${rows.length - 10}</span>` : 'Show top 10';
+	});
+</script>
+
+<style>
+	.aa-leaderboard { max-width: 100%; }
+	.aa-table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: 10px; }
+	table { border-collapse: collapse; width: 100%; }
+	th { padding: 0.9rem 1rem; background: var(--color-surface); color: var(--color-text-dim); font-size: 0.73rem; font-weight: 600; text-align: left; }
+	th:last-child, td:last-child { text-align: right; white-space: nowrap; }
+	td { padding: 0.82rem 1rem; border-top: 1px solid var(--color-border-subtle); font-size: 0.88rem; color: var(--color-text-main); }
+	tr[hidden] { display: none; }
+	.aa-rank { display: inline-block; color: var(--color-text-dim); font: 0.76rem var(--font-mono); min-width: 2.5rem; }
+	.aa-score { font-size: 0.9rem; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--color-accent); }
+	.aa-toggle { display: block; min-width: 10rem; margin: 0.8rem auto 0; padding: 0.55rem 1.2rem; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-bg); color: var(--color-text-main); font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+	.aa-toggle:hover, .aa-toggle:focus-visible { border-color: var(--color-accent); color: var(--color-accent); }
+	.aa-toggle span { margin-left: 0.4rem; color: var(--color-text-dim); }
+	.aa-note { margin: 0.8rem 0 0; color: var(--color-text-dim); font-size: 0.72rem; line-height: 1.65; }
+	@media (max-width: 640px) { th, td { padding: 0.7rem 0.6rem; } .aa-rank { min-width: 1.9rem; } }
+</style>

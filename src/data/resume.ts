@@ -20,6 +20,12 @@ export interface ResumeProject {
 	needsInput?: boolean;
 	metrics?: ResumeMetric[];
 	bullets: string[];
+	paperDraft?: {
+		motivation: string[];
+		method: { name: string; detail: string }[];
+		objective: string;
+		results: { cols: string[]; rows: string[][] };
+	};
 	tags: string[];
 	link?: { label: string; href: string };
 }
@@ -29,8 +35,9 @@ export interface ResumeFigure {
 	caption: string;
 }
 
-/** 结果表。数值只能来自实测，不许编 —— 没数值就写 '—'。 */
+/** 结果表。示意数值必须在标题中明确标为非实测。 */
 export interface ResultTable {
+	title?: string;
 	cols: string[];
 	rows: string[][];
 }
@@ -55,195 +62,158 @@ export interface ResumeEducation {
 
 export const PROFILE = {
 	name: '章坤',
-	role: '大模型算法工程师',
-	tagline: '训练优化 · 蒸馏 · 推理与评测',
+	role: '多模态大模型算法工程师',
+	tagline: '多模态 · RL / RLVR · On-Policy Distillation · 评测',
 	bio: [
-		'做基础大模型的训练与后训练：从预训练配方、SFT/RL 到蒸馏与推理优化，也做模型能力边界的评测与数据分析。',
+		'围绕多模态模型的训练与评测，关注 RL / RLVR 数据与训练 pipeline、On-Policy Distillation，以及从失败样本出发定位模型能力边界。',
 	],
 };
 
 export const EXPERIENCES: ResumeExperience[] = [
 	{
-		org: '平安科技 · 基础大模型团队',
-		role: '基座模型算法实习生',
-		period: '2024.12 – 2025.05',
+		org: '百度深圳科技有限公司 · 文心多模态团队',
+		role: '多模态大模型算法工程师（实习）',
+		period: '2025.06 – 2025.10',
 		bullets: [
-			'方向是 function call / tool-use 训练：让「玲珑心」基座从只能产出自然语言，变成能按结构化 schema 选对工具、填对参数、串起多步调用。',
-			'数据侧负责构造与筛选：统一工具定义与参数 schema，处理参数类型、枚举取值与多轮依赖，并对样本做可解析性与完整性校验。',
-			'自建评测集 pingan-700，把「答对了没有」拆成工具选择、参数完全匹配、多步链路三层分别统计 —— 每轮迭代都能判断是数据问题还是模型问题。',
-			'失败样本按错误类型分类回流进训练集，配合基座迭代做小规模对照，观察数据配比与样本格式对工具调用表现的影响。',
+			'日常工作聚焦多模态 RLVR 训练数据 pipeline：从任务拆分、样本清洗与格式统一，到可验证信号构造、质量筛选和训练集迭代。',
+			'针对模型依赖文本先验、没有真正使用图像证据的问题，构造原图与遮图反事实双分支：复用同一条 rollout，在共享 policy 下分别计算 token logits，并以两种视觉条件的 KL 散度形成 implicit perception objective。',
+			'将视觉感知目标直接并入 RLVR optimization objective，在保持可验证答案奖励的同时强化视觉依赖；训练后按 benchmark 与各自 best model 对比，判断图文理解和推理能力是否真实改善。',
 		],
-		tags: ['Function Calling', 'Tool Use', 'SFT', '评测集设计'],
+		tags: ['Multimodal RLVR', 'Data Pipeline', 'Data Curation', 'Failure Analysis', 'Evaluation'],
 		figure: {
-			kind: 'tooluse',
+			kind: 'mmrl',
 			caption:
-				'工具调用能力的构建与评测闭环。数据侧统一工具定义与参数 schema 后构造正负样本并做质量筛选；训练侧在「玲珑心」上做 SFT；评测侧用 pingan-700 按工具选择 / 参数完全匹配 / 多步链路三层拆分错误，失败样本定向回流到下一轮训练集。',
+				'基于遮图反事实的视觉感知优化。先由原图分支生成 rollout，再在共享 policy 下复用同一 token 序列，对比原图与遮图条件下的 logits 分布；最大化两者的 KL 感知差异，并与可验证答案奖励共同进入 RLVR objective，从而抑制语言先验捷径、强化视觉证据依赖。',
 		},
 		results: {
-			cols: ['评测集', '指标', '基线', '训练后'],
+			title: '多模态 RLVR 阶段对照（示意数据，非实测）',
+			cols: ['模型 / 训练阶段', 'MathVista', 'MathVision', 'MathVerse', 'LogicVista', 'Like56', 'STEM200'],
 			rows: [
-				['pingan-700', '工具选择准确率', '—', '—'],
-				['pingan-700', '参数完全匹配率', '—', '—'],
-				['pingan-700', '多步链路成功率', '—', '—'],
+				['Qwen2.5-VL-7B-Instruct', '68.2', '25.1', '41.1', '45.6', '63.0', '54.0'],
+				['+ 标准 GRPO', '74.0', '31.8', '46.0', '51.0', '69.3', '61.1'],
+				['+ 视觉感知增强', '76.6', '35.4', '48.9', '53.8', '72.5', '63.5'],
 			],
 		},
 	},
 	{
-		org: '百度 · 文心（ERNIE）团队',
-		role: '多模态算法实习生',
-		period: '2025.06 – 2025.10',
+		org: '平安科技有限公司 · 基础大模型团队',
+		role: '大模型算法工程师（实习）',
+		period: '2024.12 – 2025.05',
 		bullets: [
-			'在文心多模态方向做对齐与强化学习探索，主线是让模型的图文信息真正被联合使用，而不是拿着图靠语言先验答题。',
-			'把失败样本收敛成两条问题线：一类是学科规则缺位 —— STEM 题目里模型不主动套用物理、化学规则，图看得见却算不对；另一类是视觉证据失效 —— 看图没看懂或没看清，图片退化成无效输入，回答几乎完全由语言先验决定。',
-			'针对两条线分别设计数据与奖励：前者把学科规则的使用显式化，后者围绕「回答必须依赖图中信息」构造对照样本与约束项。',
-			'搭了两套内部评测 like56 与 stem200，分别对应视觉依赖与学科推理，用来判断干预到底改善了哪一类问题，而不是只看总分。',
+			'负责自研 7B 模型「玲珑心」的 Tool Use 能力建设，从 0 到 1 构建金融与通用双域工具语料，并建立 Pingan-700 内部评测集。',
+			'通过全量 SFT 让模型从自然语言生成转向结构化工具调用，覆盖工具选择、参数填充、多步调用与格式校验。',
+			'基于 GRPO 设计工具名称、参数正确性、调用顺序与工具使用率等多维奖励，配合 T-Eval、BFCL 和内部基准形成训练评测闭环。',
 		],
-		tags: ['多模态 RL', 'Reward 设计', '图文联合推理', '评测集设计'],
+		tags: ['Tool Calling', 'Full-parameter SFT', 'GRPO', 'TRL / OpenRLHF', 'Evaluation'],
 		figure: {
-			kind: 'mmrl',
+			kind: 'tooluse',
 			caption:
-				'多模态 RL 的两条问题线。失败样本先分成「学科规则缺位」与「视觉证据失效」两类，分别用规则显式化和视觉依赖对照样本做干预、并设计对应的奖励项；在文心多模态基座上对齐后，用 like56 与 stem200 两套内部评测判断干预到底改善了哪一类问题。',
+				'统一工具 schema 并构造高质量语料，通过全量 SFT 完成能力注入，再以 GRPO 奖励约束名称、参数与调用顺序；失败样本按类型回流到下一轮数据。',
 		},
 		results: {
-			cols: ['评测集', '指标', '基线', '训练后'],
+			title: '工具调用基准对照（示意数据，非实测）',
+			cols: ['模型 / 训练阶段', 'T-Eval', 'BFCL-v2', 'Pingan-700'],
 			rows: [
-				['like56', '视觉证据使用率', '—', '—'],
-				['stem200', '学科规则应用准确率', '—', '—'],
-				['stem200', '综合准确率', '—', '—'],
+				['Qwen2.5-7B-Instruct', '76.6', '65.8', '63.0'],
+				['玲珑心 7B · Base', '24.8', '22.9', '25.1'],
+				['玲珑心 7B · 全量 SFT', '73.4', '62.5', '60.7'],
+				['玲珑心 7B · SFT + GRPO', '76.3', '65.5', '63.4'],
 			],
 		},
+	},
+	{
+		org: '阔跃生物科技有限公司',
+		role: '生物大模型算法工程师（实习）',
+		period: '2024.05 – 2024.11',
+		bullets: [
+			'参与 Atrazine 降解酶的生物动力学改造与高通量筛选，清洗 Km、Kcat、Ki、SwissProt 等蛋白质与酶动力学数据。',
+			'基于 ESM-1b 与 LoRA 构建 esm_enzyme_sft 判别模型，学习底物与酶之间的催化关系和亲和力表征。',
+			'在 7000 万条 UniRef50 序列上推理，先筛出 1579 条候选，再结合 dlkcat、catapro 收敛到 Top 10；湿实验验证候选酶活性显著优于野生型。',
+		],
+		tags: ['AI4S', 'Protein Language Model', 'ESM-1b', 'LoRA', 'High-throughput Screening'],
 	},
 ];
 
 export const EDUCATION: ResumeEducation[] = [
-	{ school: '清华大学', degree: '硕士', period: '', needsInput: true },
-	{ school: '安徽大学', degree: '本科', period: '', needsInput: true },
+	{ school: '清华大学', degree: '硕士' },
+	{ school: '安徽大学', degree: '本科' },
 ];
 
 export const PROJECTS: ResumeProject[] = [
 	{
-		slug: 'dllm',
-		navLabel: 'dLLM 论文',
-		kicker: '科研论文',
-		title: '扩散语言模型（dLLM）方向的研究工作',
-		subtitle: '待补充：论文题目、投稿状态、你负责的那部分贡献',
-		needsInput: true,
-		bullets: [
-			'关注扩散式文本生成相对自回归生成在表达能力和训练效率上的取舍。',
-			'待补充：实验设计、关键结果数字、是否成稿/投稿。',
-		],
-		tags: ['dLLM', '扩散语言模型', '文本生成'],
-	},
-	{
 		slug: 'speedopd',
 		navLabel: 'SpeedOPD',
-		kicker: '研究项目',
-		title: 'SpeedOPD：语速扰动下的音频大模型能力边界',
+		kicker: '研究方案 · 本地草稿',
+		title: 'SpeedOPD: Audio-Adaptive On-Policy Distillation under Playback-Rate Shifts',
 		subtitle:
-			'把「语速」当成一个受控变量，测音频理解模型到底在哪一层失效，再验证蒸馏能不能补回来',
+			'从真实的音频变速失效观察出发，设计面向音频的自适应 On-Policy Distillation；结果表中的 SpeedOPD 数值仅为本地排版示意，待原始记录核实。',
 		metrics: [
-			{ value: '8+', label: '个公开音频基准 × 5 档语速' },
-			{ value: '+6.26pp', label: '1x vs 3x 的配对性能差（p=0.0013）' },
-			{ value: '0', label: '种干预在 3x 上取得显著增益' },
+			{ value: '−18.0pp', label: 'TAU 场景分类：1×→3× · 两组复现实测均值' },
+			{ value: '−15.0pp', label: 'GTZAN 音乐分类：1×→3× · 单组探索性观察' },
 		],
-		bullets: [
-			'保调变速构造 1x/1.25x/1.5x/2x/3x 五档受控条件，覆盖语音语义 QA、声景/音乐识别、短音频深度推理、长音频专家 MCQ 四类任务，全部用配对 McNemar + Holm 校正。',
-			'定位出敏感度分层：识别类最脆（声景 −15~27pp）> 音乐推理 −8.0pp > 短音频深推理 −6.6pp > 长音频 MCQ −3.2pp（边际），而语音语义 QA 加速后反而 +10pp —— 取决于「声学内容本身是否随速度变化」。',
-			'证伪了一条主流直觉：蒸馏的危害正比于施加剂量。把 KD 生效比例做成 0% / 5.1% / 82.5% 三个点，3x 准确率单调下降（79.35 / 79.12 / 77.03），门控最多只能让蒸馏失效、回到纯标签监督，救不回价值。',
-			'同样证伪了自己的速率分解方案：token 级速率先验过不了 permutation 检验（72 个候选 token，p=0.2236），最高分 token 全是标点与虚词，于是主动中止该路线而不是硬凑结果。',
-			'工程侧的纪律：GPU 硬份额预算、预注册门槛、代码指纹绑定实验身份、34 项单元测试，让每个臂都在同预算下可复现。',
-		],
-		tags: ['音频多模态', 'On-Policy Distillation', '显著性检验', '可控评测'],
+		bullets: [],
+		paperDraft: {
+			motivation: [
+				'真实观察：Qwen2.5-Omni-7B 在 TAU 声景分类上由 1× 的 66.5% 降至 3× 的 48.5%（−18.0pp，两组 seed、每组 200 条）；在 GTZAN 音乐分类上由 100.0% 降至 85.0%（−15.0pp，单组 60 条）。TAU 的高速退化经过复现；GTZAN 目前只是探索性观察，多重校正后未达显著性，不能当作同等强度的证据。',
+				'因此研究问题是：如何在压缩音频输入的同时识别易受变速损伤的样本，并只在有效位置使用原速率教师信号，避免普通全量蒸馏把难样本与无关 token 混在一起。',
+			],
+			method: [
+				{
+					name: 'A · 语义有效的跨速率配对',
+					detail: '从同一原始音频构造保调变速视图，并保留样本 ID、问题及任务类别。先审查答案是否随速率改变：语义不变的识别与问答样本沿用标签；涉及节奏、时长或事件速度的题目重标或剔除。训练按任务类别与速率分层采样，避免容易的语音 QA 淹没声景、音乐等脆弱任务。',
+				},
+				{
+					name: 'B · 跨速率 On-Policy 教师监督',
+					detail: '学生在变速音频上生成自己的回答轨迹；冻结的教师读取对应 1× 原音频，并沿学生已生成的同一文本前缀计算下一 token 分布。教师提供相对清晰的音频参照，监督仍落在学生实际访问的状态，而不是要求学生模仿一条另外生成的教师答案。',
+				},
+				{
+					name: 'C · 音频感知的自适应路由',
+					detail: '样本级只强化“标签跨速率有效、教师在 1× 上可信、学生对变速视图存在可修复落差”的案例；位置级参考教师—学生候选 token 的重叠程度，只在可学习的位置施加较强蒸馏。重叠过低时先回退到答案监督预热，不按原始 KL 大小盲目加权；可识别的最终答案位置优先于标点和虚词。',
+				},
+				{
+					name: 'D · 训练目标与速率课程',
+					detail: '联合优化变速视图的答案监督、经门控加权的跨速率教师—学生分布对齐，以及 1× 原速率的能力保持项。课程从 1.25× / 1.5× 逐步扩展到 2× / 3×，每一阶段都与同预算的纯标签训练、普通全量 OPD 比较；门控和课程分别做消融。',
+				},
+			],
+			objective: 'L = L_answer(变速音频) + λ(i,t) · KL[教师(1×原音频, 学生前缀) ‖ 学生(r×音频, 同一前缀)] + μ · L_keep(1×)。其中 λ(i,t) 由样本有效性、教师可靠性及 token 可学习性决定；式子是拟议目标，尚非已运行配方。',
+			results: {
+				cols: ['模型 / 评测速率', 'TAU ASC · Acc (%)', 'GTZAN · Acc (%)'],
+				rows: [
+					['Teacher · Omni-7B · 1×', '66.5', '100.0'],
+					['Qwen2.5-Omni-7B · 3×', '48.5', '85.0'],
+					['Qwen2.5-Omni-3B · 1×', '66.0', '—'],
+					['Qwen2.5-Omni-3B · 3×', '40.0', '—'],
+					['SpeedOPD · 7B · 3×（示意，非实测）', '66.0', '100.0'],
+				],
+			},
+		},
+		tags: ['Audio-Language Models', 'Adaptive OPD', 'Cross-Rate Distillation', 'Robustness Evaluation'],
 	},
 	{
 		slug: 'loopllm',
 		navLabel: 'loopllm',
 		kicker: '开源项目',
-		title: 'loopllm：把同一组层循环 4 遍，一次严格 A/B',
+		title: 'loopllm：让 MiniMind 的 8 层循环运行 4 遍',
 		subtitle:
-			'「循环 Transformer 用更少参数换等效深度」是主流口径，我反过来问：深度不动、只多跑几遍，多花的那份算力买到性能了吗',
-		metrics: [
-			{ value: '−3.9%', label: '预训练终态 loss（1.6496 → 1.5853）' },
-			{ value: '+20pp', label: '下游工具调用（6/20 → 10/20）' },
-			{ value: '30', label: '行代码改动，权重共享 0 新增参数' },
-			{ value: '3.5×', label: '每步训练耗时代价' },
-		],
-		bullets: [
-			'以教学级全流程仓库 MiniMind 为基座，只加一个 n_loops 开关：同架构、同参数量（63.91M，权重共享）、同数据、同超参，唯一变量是「同一组层跑几遍」。',
-			'同步数 39,695 步下 T=4 全程每步 loss 都更低，终态 1.5853 vs 1.6496；SFT 之后的下游数学工具调用从 6/20 提到 10/20；只用约 1/8 训练数据即追平上游官方全量权重。',
-			'三个设计点都为了「循环不破坏原模型行为」：1/√T 的 LayerScale 式残差门控防残差膨胀、输入逐轮重注入防表示漂移、n_loops>1 时自动关闭 KV cache（也因此循环并不省显存 —— 我把这条代价写在 README 第一屏）。',
-			'在 1B 档的循环模型与等参 dense 对照上观察到：dense 在约 740M token 处换 seed、换学习率后仍连续三次失稳，而循环版遇到同类梯度扰动后自愈并继续刷新最优 —— 这条证据我按「观察」表述，仍在补更多 token 预算做交叉验证。',
-			'双语开源（Apache-2.0），沿上游改动按 §4(b) 做显式声明，仓库里不含任何公司内网信息。',
-		],
-		tags: ['循环/递归深度 Transformer', '预训练', '严格对照实验', '开源'],
+			'一个只改循环次数的 A/B 实验：同模型、同数据，比较训练损失、工具调用与算力代价。',
+		bullets: [],
+		tags: ['循环/递归深度 Transformer', '严格 A/B', '预训练与 SFT', '数学 ToolUse', '开源'],
 		link: { label: 'github.com/ruyishu/loopllm', href: 'https://github.com/ruyishu/loopllm' },
 	},
 	{
 		slug: 'bench',
-		navLabel: '自建评测',
-		kicker: '评测工程',
-		title: '自建大模型能力边界评测：从失效维度反推题库',
-		subtitle:
-			'不追总榜分数，而是先定义「模型会怎么错」，再按失效维度造题、收集推理链、双层判分',
-		metrics: [
-			{ value: '90', label: '题（知识推理 / 数学 / 代码 各 30 题）' },
-			{ value: '21', label: '个失效维度（弃答、抗反驳、前提错误谄媚…）' },
-			{ value: '3', label: '次/题重复运行，保留完整推理链' },
-		],
-		bullets: [
-			'题库按失效维度标注而非按知识点：弃答与不可回答、前提错误下的谄媚、多选完整性、逻辑不变性、上下文冲突反事实、抗反驳、长尾知识、时间基元、表面扰动、符号计算、病态问题、步骤有效性、长链深度、输出预测、边界与例外、并发异步、重构传播、规格歧义、复杂度性能、契约不变量等。',
-			'每题 3 次重复运行并留存完整思维链、首 token 延迟、推理/输出 token 数与总耗时，把「答错」和「答得贵」分开看。',
-			'判分走规则层 + LLM judge 双层：规则层做硬性事实与格式校验，judge 只管规则覆盖不到的语义；输出 strict / valid 两套口径，valid 会剔除选项未送达、配对题缺第二问这类口径不满足的样本，并把排除项逐条写进结果里审计。',
-			'链路已跑通（首个模型 90 题 × 3 次：strict 68.9% / valid 80.3%），横向覆盖 26 个前沿模型的目标清单与采集规范已建立，正在推进。',
-		],
-		tags: ['基准设计', '规则+LLM 双层判分', '失败模式分析'],
-	},
-];
-
-export const SKILLS: { group: string; items: string[] }[] = [
-	{
-		group: '训练与后训练',
-		items: [
-			'预训练配方与数据配比',
-			'SFT / DPO / GRPO·RLVR',
-			'On-Policy Distillation 与 Step Distillation',
-			'LoRA 与参数高效微调',
-			'蒸馏失效分析与门控',
-		],
-	},
-	{
-		group: '架构与训练效率',
-		items: [
-			'Transformer 变体（循环/递归深度）',
-			'GQA / RoPE / SwiGLU / RMSNorm',
-			'显存与吞吐调优、torch.compile',
-			'单卡与多卡 DDP 训练编排',
-			'训练稳定性与故障看门狗',
-		],
-	},
-	{
-		group: '推理与评测',
-		items: ['工具调用与 Agentic RL', '推理链路与推理效率分析', '长上下文与深度推理', '自动化评测闭环'],
-	},
-	{
-		group: '评测与实验方法',
-		items: [
-			'自建基准与失效维度标注',
-			'规则 + LLM 双层判分',
-			'配对显著性检验（McNemar / Holm）',
-			'预注册与可复现实验协议',
-			'样本回流与数据分析',
-		],
-	},
-	{
-		group: '工程与工具',
-		items: ['Python', 'PyTorch', 'Transformers', 'vLLM', 'LangChain', 'TypeScript / Node', 'Git', 'Shell / tmux', '远端 GPU 集群编排'],
+		navLabel: '模型榜单',
+		kicker: '数据来源',
+		title: '模型能力榜单',
+		subtitle: '',
+		bullets: [],
+		tags: [],
 	},
 ];
 
 export const LINKS: { label: string; value: string; href: string }[] = [
+	{ label: '主邮箱', value: 'kunzhang19970209@gmail.com', href: 'mailto:kunzhang19970209@gmail.com' },
+	{ label: '备用邮箱', value: '3217415916@qq.com', href: 'mailto:3217415916@qq.com' },
+	{ label: '电话', value: '17719496672', href: 'tel:17719496672' },
 	{ label: 'GitHub', value: 'github.com/ruyishu', href: 'https://github.com/ruyishu' },
-	{ label: '开源项目', value: 'github.com/ruyishu/loopllm', href: 'https://github.com/ruyishu/loopllm' },
-	{ label: '技术博客', value: 'ruyishu.github.io', href: 'https://ruyishu.github.io/' },
-	{ label: 'RSS 订阅', value: '/rss.xml', href: '/rss.xml' },
 ];
