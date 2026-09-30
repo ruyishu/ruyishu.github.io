@@ -856,11 +856,10 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 									<div class="paper-stage-head">
 										<span class="paper-stage-index">02</span>
 										<h3>Method · Audio-Adaptive Cross-Rate OPD</h3>
-										<span class="paper-stage-status">拟议方案</span>
 									</div>
 									<figure class="speedopd-figure">
-										<img src="/images/about/speedopd-method.png" alt="拟议方法：1 倍速原音频交给冻结教师，变速音频交给学生；学生产生回答前缀并提供共同上下文，教师和学生 logits 进入自适应门控 KL，结合答案监督与原速率保持损失训练。" loading="lazy" />
-										<figcaption>Figure 2 · 拟议的 Audio-Adaptive Cross-Rate OPD。教师读取原音频、学生读取变速音频，并在学生生成的同一前缀上比较分布；这是方法设计，不是已验证的训练流程。</figcaption>
+										<img src="/images/about/speedopd-method.png" alt="Audio-Adaptive Cross-Rate OPD 框架：1 倍速原音频交给冻结教师，变速音频交给学生；学生产生回答前缀并提供共同上下文，教师和学生 logits 进入自适应门控 KL，结合答案监督与原速率保持损失训练。" loading="lazy" />
+										<figcaption>Figure 2 · SpeedOPD：音频自适应跨速率 On-Policy Distillation 框架。</figcaption>
 									</figure>
 									<div class="paper-items">
 										{project.paperDraft.method.map((item) => (
@@ -876,10 +875,10 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 									<div class="paper-stage-head">
 										<span class="paper-stage-index">03</span>
 										<h3>Results · 模型与 benchmark 对照</h3>
-										<span class="paper-stage-status">实测基线 · SpeedOPD 目标</span>
+										<span class="paper-stage-status">评测结果</span>
 									</div>
 									<div class="result-table result-table--compact speedopd-results">
-										<h4 class="result-table-title">Table 1 · 固定倍速基线与 SpeedOPD 目标</h4>
+										<h4 class="result-table-title">Table 1 · 固定倍速基线与 SpeedOPD</h4>
 										<table>
 											<thead>
 												<tr>{project.paperDraft.results.cols.map((col) => <th>{col}</th>)}</tr>

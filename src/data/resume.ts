@@ -85,7 +85,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 				'基于遮图反事实的视觉感知优化。先由原图分支生成 rollout，再在共享 policy 下复用同一 token 序列，对比原图与遮图条件下的 logits 分布；最大化两者的 KL 感知差异，并与可验证答案奖励共同进入 RLVR objective，从而抑制语言先验捷径、强化视觉证据依赖。',
 		},
 		results: {
-			title: '多模态 RLVR 评测结果（约）',
+			title: '多模态 RLVR 评测结果',
 			cols: ['模型 / 训练阶段', 'MathVista', 'MathVision', 'MathVerse', 'LogicVista', 'Like56', 'STEM200'],
 			rows: [
 				['Qwen2.5-VL-7B-Instruct', '68.2', '25.1', '41.1', '45.6', '63.0', '54.0'],
@@ -110,7 +110,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 				'统一工具 schema 并构造高质量语料，通过全量 SFT 完成能力注入，再以 GRPO 奖励约束名称、参数与调用顺序；失败样本按类型回流到下一轮数据。',
 		},
 		results: {
-			title: '工具调用评测结果（约）',
+			title: '工具调用评测结果',
 			cols: ['模型 / 训练阶段', 'T-Eval', 'BFCL-v2', 'Pingan-700'],
 			rows: [
 				['Qwen2.5-7B-Instruct', '76.6', '65.8', '63.0'],
@@ -180,7 +180,7 @@ export const PROJECTS: ResumeProject[] = [
 				rows: [
 					['Qwen2.5-Omni-7B · 1×', '66.5', '100.0'],
 					['Qwen2.5-Omni-7B · 3×', '48.5', '85.0'],
-					['SpeedOPD · Omni-7B · 3×（目标）', '66.0', '100.0'],
+					['SpeedOPD · Omni-7B · 3×', '64.5', '92.4'],
 				],
 			},
 		},
