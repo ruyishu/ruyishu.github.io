@@ -75,7 +75,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 		period: '2025.06 – 2025.10',
 		blocks: [
 			{
-				text: '负责多模态 RLVR 的训练数据 pipeline：从近百万条无标图文 query 起步，先按可验证性与图文相关性剔除开放题、主观题和「贴张图问一道无关题」的样本；抽 200 条人工校准 prompt 与采样参数（temperature / top-p），把过滤的 precision 与 recall 对齐后冻结。再用 Pass@K 给题目分难度，6 个 Think 模型分档 rollout——简单题要 5/6 答案一致才采纳，难题放宽到 3/6，参考答案就是这套分层一致率反推出来的弱标签。最后按答案 Acc 与 CoT 过程双层清洗，剔除复读死循环、前后矛盾、算错硬凑与无依据跳步。',
+				text: '负责多模态 RLVR 训练数据的构建：面向近百万条无标注图文 query，先按可验证性与图文相关性剔除开放题、主观题及图文弱相关样本；抽取 200 条人工校准 prompt 与采样参数（temperature / top-p），对齐筛选环节的 precision 与 recall 后固化配置。随后以 Pass@K 划分题目难度，交由 6 个 Think 模型按档位 rollout，并按难度设定答案一致率阈值（简单题 5/6、难题 3/6），据此生成参考答案弱标签。最终对 rollout 做答案 Acc 与 CoT 过程双层清洗，过滤重复推理、逻辑矛盾、过程错误而结果巧合以及无依据跳步，产出可直接用于后训练的数据集。',
 				figure: {
 					kind: 'rlvrdata',
 					caption:
@@ -83,7 +83,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 				},
 			},
 			{
-				text: '另一条线把定位做成奖励：模型在作答前先输出关键区域的坐标（ROI），与标注框计算 IoU，作为可验证答案之外的额外 reward 并入 RLVR。这类题答得对不对，很大程度上取决于框得准不准——一条街上招牌并排，认出「哪家是奶茶店」需要先把招牌框对，而不是笼统看一眼整条街。',
+				text: '设计基于定位的额外奖励：模型在作答前先输出关键区域坐标（ROI），与标注框计算 IoU，并与可验证答案奖励加权构成 RLVR 训练信号（r = r_acc + λ·IoU）。针对招牌密集、需要区分相邻门店的高分辨率场景，把「框得准」转化为可优化的训练目标，降低模型仅凭文本先验作答的比例。',
 				figure: {
 					kind: 'mmrl',
 					caption:
