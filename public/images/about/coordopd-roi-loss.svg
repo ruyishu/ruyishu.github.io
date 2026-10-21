@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="550" viewBox="0 0 1080 550" role="img" aria-labelledby="title">
+<title id="title">Coord-OPD：完整 OPD 蒸馏加上坐标 token 的 ROI 几何损失</title>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 1 L7 4 L0 7" fill="none" stroke="#64748b" stroke-width="1.3"/></marker></defs>
+<style>text{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;fill:#18181b}.title{font-size:24px;font-weight:700}.head{font-size:18px;font-weight:700}.body{font-size:16px}.small{font-size:14px}.mono{font-family:Consolas,monospace;font-size:16px}</style><rect width="1080" height="550" fill="white"/>
+<text x="30" y="43" class="title">Coord-OPD = OPD + ROI loss</text>
+<text x="30" y="69" class="small" style="fill:#64748b">学生自身轨迹上的分布对齐与区域几何监督</text>
+<rect x="30" y="180" width="180" height="150" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="48" y="212" class="head">图像 + 问题</text>
+<text x="48" y="246" class="small">高分辨率视觉输入</text>
+<text x="48" y="278" class="body">学生自主采样</text>
+<text x="48" y="307" class="small" style="fill:#64748b">on-policy rollout</text>
+<path d="M210 255 H250" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="260" y="160" width="220" height="190" rx="8" fill="#eff6ff" stroke="#93b4fb"/>
+<text x="280" y="194" class="head" style="fill:#2563eb">Student πθ</text>
+<text x="280" y="230" class="body">生成轨迹与坐标</text>
+<text x="280" y="265" class="body">共享学生前缀 ht</text>
+<text x="280" y="300" class="small" style="fill:#2563eb">仅更新学生参数</text>
+<path d="M480 205 H505 V173 H530" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="540" y="110" width="230" height="112" rx="8" fill="#fffbeb" stroke="#e5ce98"/>
+<text x="560" y="142" class="head" style="fill:#9a650c">Frozen teacher</text>
+<text x="560" y="175" class="small">同一前缀上的 token 分布</text>
+<text x="560" y="203" class="small" style="fill:#9a650c">教师参考区域 BT</text>
+<path d="M770 160 H800" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="810" y="110" width="240" height="112" rx="8" fill="#eff6ff" stroke="#93b4fb"/>
+<text x="828" y="142" class="head" style="fill:#2563eb">完整 OPD 损失</text>
+<text x="828" y="175" class="mono">KL(pstudent ∥ pteacher)</text>
+<text x="828" y="203" class="small">全部有效生成 token</text>
+<path d="M480 300 H530" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M655 223 V265" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="540" y="276" width="230" height="120" rx="8" fill="#f3faf8" stroke="#a4cfc4"/>
+<text x="558" y="307" class="head" style="fill:#147d70">几何目标 qgeo</text>
+<text x="558" y="339" class="small">GIoU → 候选坐标权重</text>
+<text x="558" y="370" class="body">沿数字前缀聚合</text>
+<path d="M770 335 H800" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="810" y="276" width="240" height="120" rx="8" fill="#f3faf8" stroke="#a4cfc4"/>
+<text x="828" y="307" class="head" style="fill:#147d70">附加 ROI 损失</text>
+<text x="828" y="339" class="mono">KL(qgeo ∥ pstudent)</text>
+<text x="828" y="370" class="small">坐标数字 token</text>
+<path d="M1051 166 H1066 V445 H1029" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M930 397 V424" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="695" y="435" width="330" height="61" rx="8" fill="#fff" stroke="#94a3b8"/>
+<text x="716" y="473" class="head">L = LOPD + λ · LROI</text>
+<path d="M695 466 H370 V351" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="5 4"/>
+<text x="415" y="451" class="small" style="fill:#2563eb">反向传播</text>
+<text x="30" y="525" class="small" style="fill:#64748b">ROI loss 直接作用于现有坐标数字输出；标准 OPD 项完整保留。</text>
+</svg>

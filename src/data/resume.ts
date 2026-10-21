@@ -20,12 +20,6 @@ export interface ResumeProject {
 	needsInput?: boolean;
 	metrics?: ResumeMetric[];
 	bullets: string[];
-	paperDraft?: {
-		motivation: string[];
-		method: { name: string; detail: string }[];
-		objective: string;
-		results: { cols: string[]; rows: string[][] };
-	};
 	tags: string[];
 	link?: { label: string; href: string };
 }
@@ -74,15 +68,15 @@ export const EXPERIENCES: ResumeExperience[] = [
 		role: '多模态大模型算法工程师（实习）',
 		period: '2025.06 – 2025.10',
 		bullets: [
-			'日常工作聚焦多模态 RLVR 训练数据 pipeline：从任务拆分、样本清洗与格式统一，到可验证信号构造、质量筛选和训练集迭代。',
-			'针对模型依赖文本先验、没有真正使用图像证据的问题，构造原图与遮图反事实双分支：复用同一条 rollout，在共享 policy 下分别计算 token logits，并以两种视觉条件的 KL 散度形成 implicit perception objective。',
-			'将视觉感知目标直接并入 RLVR optimization objective，在保持可验证答案奖励的同时强化视觉依赖；训练后按 benchmark 与各自 best model 对比，判断图文理解和推理能力是否真实改善。',
+			'参与多模态 RLVR 数据筛选与训练集迭代，围绕任务定义、图文清洗、可验证标签、难度诊断和数据配比组织训练数据，并通过失败样本分析定位质量问题。',
+			'针对模型难以定位问题相关视觉证据的瓶颈，构建“先定位关键区域、再基于区域证据回答”的训练过程，使模型在作答前显式识别应关注的位置。',
+			'在可验证答案奖励之外，引入预测区域与参考区域的 IoU（交并比）定位奖励，将“找对位置”与“答对问题”共同纳入 RLVR 优化；通过多模态基准评测观察定位监督对理解与推理表现的影响。',
 		],
-		tags: ['Multimodal RLVR', 'Data Pipeline', 'Data Curation', 'Failure Analysis', 'Evaluation'],
+		tags: ['Multimodal RLVR', 'Data Curation', 'Visual Grounding', 'IoU Reward', 'Evaluation'],
 		figure: {
 			kind: 'mmrl',
 			caption:
-				'基于遮图反事实的视觉感知优化。先由原图分支生成 rollout，再在共享 policy 下复用同一 token 序列，对比原图与遮图条件下的 logits 分布；最大化两者的 KL 感知差异，并与可验证答案奖励共同进入 RLVR objective，从而抑制语言先验捷径、强化视觉证据依赖。',
+				'问题驱动的视觉定位：模型先预测关键区域，再生成答案；训练时以区域 IoU 奖励和可验证答案奖励共同优化策略。',
 		},
 		results: {
 			title: '多模态 RLVR 评测结果',
@@ -90,7 +84,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 			rows: [
 				['Qwen2.5-VL-7B-Instruct', '68.2', '25.1', '41.1', '45.6', '63.0', '54.0'],
 				['+ 标准 GRPO', '74.0', '31.8', '46.0', '51.0', '69.3', '61.1'],
-				['+ 视觉感知增强', '76.6', '35.4', '48.9', '53.8', '72.5', '63.5'],
+				['+ IoU 定位奖励', '76.6', '35.4', '48.9', '53.8', '72.5', '63.5'],
 			],
 		},
 	},
@@ -140,61 +134,24 @@ export const EDUCATION: ResumeEducation[] = [
 
 export const PROJECTS: ResumeProject[] = [
 	{
-		slug: 'speedopd',
-		navLabel: 'SpeedOPD',
-		kicker: '研究方案',
-		title: 'SpeedOPD: Audio-Adaptive On-Policy Distillation under Playback-Rate Shifts',
+		slug: 'coordopd',
+		navLabel: 'Coord-OPD',
+		kicker: '研究项目',
+		title: 'Coord-OPD：几何感知的区域定位蒸馏',
 		subtitle:
-			'从音频变速后的准确率退化观察出发，设计面向音频的自适应 On-Policy Distillation；当前展示固定倍速观察与后续研究方案。',
-		metrics: [
-			{ value: '−18.0pp', label: 'TAU 场景分类：1×→3× · 两组复现实测均值' },
-			{ value: '−15.0pp', label: 'GTZAN 音乐分类：1×→3× · 单组探索性观察' },
-		],
+			'在标准 On-Policy Distillation 上叠加 ROI loss，将区域几何关系引入坐标 token 的训练，提升高分辨率视觉问答中的证据定位能力。',
 		bullets: [],
-		paperDraft: {
-			motivation: [
-				'真实观察：Qwen2.5-Omni-7B 在 TAU 声景分类上由 1× 的 66.5% 降至 3× 的 48.5%（−18.0pp，两组 seed、每组 200 条）；在 GTZAN 音乐分类上由 100.0% 降至 85.0%（−15.0pp，单组 60 条）。TAU 的高速退化经过复现；GTZAN 目前只是探索性观察，多重校正后未达显著性，不能当作同等强度的证据。',
-				'因此研究问题是：如何在压缩音频输入的同时识别易受变速损伤的样本，并只在有效位置使用原速率教师信号，避免普通全量蒸馏把难样本与无关 token 混在一起。',
-			],
-			method: [
-				{
-					name: 'A · 语义有效的跨速率配对',
-					detail: '从同一原始音频构造保调变速视图，并保留样本 ID、问题及任务类别。先审查答案是否随速率改变：语义不变的识别与问答样本沿用标签；涉及节奏、时长或事件速度的题目重标或剔除。训练按任务类别与速率分层采样，避免容易的语音 QA 淹没声景、音乐等脆弱任务。',
-				},
-				{
-					name: 'B · 跨速率 On-Policy 教师监督',
-					detail: '学生在变速音频上生成自己的回答轨迹；冻结的教师读取对应 1× 原音频，并沿学生已生成的同一文本前缀计算下一 token 分布。教师提供相对清晰的音频参照，监督仍落在学生实际访问的状态，而不是要求学生模仿一条另外生成的教师答案。',
-				},
-				{
-					name: 'C · 音频感知的自适应路由',
-					detail: '样本级只强化“标签跨速率有效、教师在 1× 上可信、学生对变速视图存在可修复落差”的案例；位置级参考教师—学生候选 token 的重叠程度，只在可学习的位置施加较强蒸馏。重叠过低时先回退到答案监督预热，不按原始 KL 大小盲目加权；可识别的最终答案位置优先于标点和虚词。',
-				},
-				{
-					name: 'D · 训练目标与速率课程',
-					detail: '联合优化变速视图的答案监督、经门控加权的跨速率教师—学生分布对齐，以及 1× 原速率的能力保持项。课程从 1.25× / 1.5× 逐步扩展到 2× / 3×，每一阶段都与同预算的纯标签训练、普通全量 OPD 比较；门控和课程分别做消融。',
-				},
-			],
-			objective: 'L = L_answer(变速音频) + λ(i,t) · KL[教师(1×原音频, 学生前缀) ‖ 学生(r×音频, 同一前缀)] + μ · L_keep(1×)。其中 λ(i,t) 由样本有效性、教师可靠性及 token 可学习性决定；式子是拟议目标，尚非已运行配方。',
-			results: {
-				cols: ['模型 / 评测速率', 'TAU ASC · Acc (%)', 'GTZAN · Acc (%)'],
-				rows: [
-					['Qwen2.5-Omni-7B · 1×', '66.5', '100.0'],
-					['Qwen2.5-Omni-7B · 3×', '48.5', '85.0'],
-					['SpeedOPD · Omni-7B · 3×', '64.5', '92.4'],
-				],
-			},
-		},
-		tags: ['Audio-Language Models', 'Adaptive OPD', 'Cross-Rate Distillation', 'Robustness Evaluation'],
+		tags: ['On-Policy Distillation', 'ROI Loss', 'Visual Grounding', 'High-resolution VQA'],
 	},
 	{
 		slug: 'loopllm',
 		navLabel: 'loopllm',
 		kicker: '开源项目',
-		title: 'loopllm：让 MiniMind 的 8 层循环运行 4 遍',
+		title: 'loopllm：共享权重循环深度的实验研究',
 		subtitle:
-			'一个只改循环次数的 A/B 实验：同模型、同数据，比较训练损失、工具调用与算力代价。',
+			'基于 MiniMind，在近似固定参数规模下研究循环计算深度对训练目标与数学工具调用表现的影响，并分析相应的计算开销。',
 		bullets: [],
-		tags: ['循环/递归深度 Transformer', '严格 A/B', '预训练与 SFT', '数学 ToolUse', '开源'],
+		tags: ['循环/递归深度 Transformer', '受控对照', '预训练与 SFT', '数学 ToolUse', '开源'],
 		link: { label: 'github.com/ruyishu/loopllm', href: 'https://github.com/ruyishu/loopllm' },
 	},
 	{

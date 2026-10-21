@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="990" viewBox="0 0 440 990" role="img" aria-labelledby="title">
+<title id="title">Coord-OPD 的学生轨迹、标准蒸馏与 ROI 几何监督</title>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 1 L7 4 L0 7" fill="none" stroke="#64748b" stroke-width="1.3"/></marker></defs>
+<style>text{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;fill:#18181b}.title{font-size:24px;font-weight:700}.head{font-size:18px;font-weight:700}.body{font-size:16px}.small{font-size:14px}.mono{font-family:Consolas,monospace;font-size:16px}</style><rect width="440" height="990" fill="white"/>
+<text x="24" y="38" class="title">Coord-OPD</text>
+<text x="24" y="65" class="body" style="fill:#64748b">标准 OPD + ROI loss</text>
+<rect x="24" y="92" width="392" height="138" rx="8" fill="#eff6ff" stroke="#93b4fb"/>
+<text x="44" y="125" class="head" style="fill:#2563eb">01  学生自主采样</text>
+<text x="44" y="160" class="body">图像 + 问题 → 学生轨迹与区域坐标</text>
+<text x="44" y="199" class="body">教师沿相同学生前缀提供监督</text>
+<path d="M220 231 V266" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="24" y="277" width="392" height="172" rx="8" fill="#eff6ff" stroke="#93b4fb"/>
+<text x="44" y="311" class="head" style="fill:#2563eb">02  保留完整 OPD 项</text>
+<text x="44" y="351" class="body">冻结教师的下一 token 分布</text>
+<text x="44" y="392" class="mono">LOPD = KL(pstudent ∥ pteacher)</text>
+<text x="44" y="427" class="small" style="fill:#64748b">覆盖全部有效生成 token</text>
+<path d="M220 450 V484" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="24" y="495" width="392" height="232" rx="8" fill="#f3faf8" stroke="#a4cfc4"/>
+<text x="44" y="529" class="head" style="fill:#147d70">03  叠加坐标几何监督</text>
+<text x="44" y="568" class="body">教师参考框 + 候选坐标 → GIoU 权重</text>
+<text x="44" y="606" class="body">沿学生数字前缀聚合 → qgeo</text>
+<text x="44" y="650" class="mono">LROI = KL(qgeo ∥ pstudent)</text>
+<text x="44" y="697" class="small" style="fill:#64748b">仅在坐标数字位置计算附加损失</text>
+<path d="M220 728 V762" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="24" y="773" width="392" height="135" rx="8" fill="#fff" stroke="#94a3b8"/>
+<text x="44" y="809" class="head">04  联合优化</text>
+<text x="44" y="850" class="head">L = LOPD + λ · LROI</text>
+<text x="44" y="884" class="small" style="fill:#2563eb">只更新学生，教师保持冻结</text>
+<text x="24" y="952" class="small" style="fill:#64748b">两路监督来自同一学生轨迹，损失相加。</text>
+</svg>

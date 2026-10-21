@@ -13,29 +13,29 @@ const lossRows = [
 
 <div class="loop-study">
 	<section class="loop-section" aria-labelledby="loop-intro">
-		<div class="loop-heading"><span>01</span><h3 id="loop-intro">项目介绍</h3></div>
+		<div class="loop-heading"><span>01</span><h3 id="loop-intro">研究问题</h3></div>
 		<p>
-			loopllm 是基于 MiniMind 的个人开源复现实验。它要回答的问题很直接：<strong>不砍掉原本的 8 层，只让同一组 Transformer 层重复执行 4 遍，多花的计算能否换来更好的模型表现？</strong>
-			项目保留 MiniMind 的训练链路，增加循环次数开关，并用预训练、SFT 和数学工具调用评测检验效果。
+			loopllm 基于 MiniMind 研究参数共享条件下的循环深度扩展：<strong>在近似固定参数规模下，增加同一 Transformer 层栈的执行次数，能否改善模型的优化表现与下游任务表现？</strong>
+			实验沿用 MiniMind 的训练链路，在预训练与监督微调阶段比较单次前向与四轮循环配置，并以数学工具调用作为下游探测任务。
 		</p>
 		<div class="loop-facts" aria-label="项目基本信息">
 			<span><b>基座</b> MiniMind · 8 层 / d768</span>
 			<span><b>参数</b> 两组均约 63.91M</span>
-			<span><b>变量</b> 循环次数 T=1 / T=4</span>
+			<span><b>配置</b> 单次前向 T=1 / 四轮循环 T=4</span>
 		</div>
 	</section>
 
 	<section class="loop-section" aria-labelledby="loop-design">
-		<div class="loop-heading"><span>02</span><h3 id="loop-design">项目实验设计</h3></div>
+		<div class="loop-heading"><span>02</span><h3 id="loop-design">方法与实验设置</h3></div>
 		<p>
-			每组 A/B 都使用相同的模型宽度、数据和预训练 / SFT 配置；T=1 运行原版 8 层，T=4 共享权重、把这 8 层循环 4 遍。
-			分别跑 mini 与完整数据档，比较同步训练步数下的 loss，再用同一套 20 题数学 ToolUse 测最终答案正确率。
+			对照组 T=1 执行一次 8 层 Transformer；实验组 T=4 共享同一层栈的参数并执行四轮循环，同时引入轮次残差门控与初始输入重注入。两组使用相同模型宽度、数据档及预训练 / SFT 配置。
+			实验分别覆盖 mini 与完整数据档，在同步训练步数处比较 loss，并在固定的 20 题数学 ToolUse 评测上报告最终答案正确率。该设计控制了数据与更新步数，未对齐总计算预算。
 		</p>
 		<figure class="loop-figure loop-architecture">
 			<a href="/images/about/loopllm-architecture-v2.png" target="_blank" rel="noopener noreferrer" aria-label="放大查看 T=1 与 T=4 的模型结构对照图">
 				<img src="/images/about/loopllm-architecture-v2.png" alt="左侧 T=1：输入顺序经过 8 层后输出；右侧 T=4：同一组 8 层权重重复执行 4 次，循环箭头回到层栈顶部，第四次后输出。" loading="lazy" />
 			</a>
-			<figcaption>Figure 1 · 核心区别是复用同一组 8 层权重，而不是堆出 32 个独立层。右侧每轮还使用残差门控；第 2–4 轮重注入初始输入。图为机制示意，点击可放大。</figcaption>
+			<figcaption>Figure 1 · 共享参数的循环层栈。T=4 复用同一组 8 层权重，每轮采用残差门控，第 2–4 轮重注入初始输入；增加的是计算深度，主体参数规模近似不变。点击可放大。</figcaption>
 		</figure>
 		<div class="loop-table-wrap">
 			<table class="loop-table loop-design-table">
@@ -52,8 +52,8 @@ const lossRows = [
 	</section>
 
 	<section class="loop-section" aria-labelledby="loop-results">
-		<div class="loop-heading"><span>03</span><h3 id="loop-results">项目结果</h3></div>
-		<p>最直观的变化在数学工具调用：mini 档答对数从 6/20 到 10/20，完整档从 7/20 到 13/20。下图只比较 SFT 权重、相同题目与相同工具设置。</p>
+		<div class="loop-heading"><span>03</span><h3 id="loop-results">实验结果与适用范围</h3></div>
+		<p>在固定的 math_only 评测中，T=4 的最终答案正确率高于 T=1：mini 档为 6/20 → 10/20，完整档为 7/20 → 13/20。以下结果采用 SFT 检查点，并保持评测题目与计算器工具设置一致。</p>
 		<figure class="loop-figure">
 			<svg viewBox="0 0 680 300" role="img" aria-labelledby="loop-chart-title loop-chart-desc">
 				<title id="loop-chart-title">T=1 与 T=4 的数学 ToolUse 正确率对比</title>
@@ -79,7 +79,7 @@ const lossRows = [
 				))}
 				<text x="24" y="151" transform="rotate(-90 24 151)" class="chart-axis-label">准确率 (%)</text>
 			</svg>
-			<figcaption>Figure 2 · SFT 后的数学工具调用对照。mini：6/20 → 10/20（+20pp）；完整：7/20 → 13/20（+30pp）。20 题为自建评测，不是通用能力榜单。</figcaption>
+			<figcaption>Figure 2 · SFT 后的数学工具调用对照。mini：6/20 → 10/20（+20pp）；完整：7/20 → 13/20（+30pp）。评测包含 20 道自建题目，结果用于描述该任务上的观察。</figcaption>
 		</figure>
 		<details class="loop-more-results">
 			<summary>展开技术报告中的完整四臂、五阶段对照图</summary>
@@ -101,8 +101,9 @@ const lossRows = [
 			</a>
 			<figcaption>Figure 3 · 复用技术报告 Figure 2：mini 档预训练的六个同步步数采样点。终态 loss 1.6496 → 1.5853；曲线未展示每一步的原始记录，点击可放大。</figcaption>
 		</figure>
-		<p class="loop-cost"><strong>收益有代价：</strong>完整档 SFT 步速从 8.08 降到 2.29 步/秒，约 3.5× 每步训练耗时；循环实现也不省显存。</p>
-		<p class="loop-fine">结论仅覆盖约 64M 模型和 20 题单一任务；尚无等算力对照。T=4 的 RL 训练预算未跑满，因此这里不把后续 RL 阶段的分数当作额外增益。</p>
+		<p class="loop-cost"><strong>计算开销。</strong>完整档 SFT 吞吐量由 8.08 降至 2.29 步/秒，对应约 3.5× 的每步训练耗时；当前循环实现未带来显存节省。</p>
+		<p><strong>实验结论：</strong>在约 64M 参数规模下，共享权重的四轮循环同时改善了预训练 / SFT loss 与数学工具调用表现，展示了通过增加计算深度提升小模型能力的可行性。</p>
+		<p class="loop-fine">评测口径：同数据、同步数对照；工具调用为 20 题 math_only。计算预算未对齐，结论聚焦预训练与 SFT 阶段。</p>
 	</section>
 	<p class="loop-source">数据与实验口径：<a href="https://github.com/ruyishu/loopllm/blob/main/docs/%E6%8A%80%E6%9C%AF%E6%8A%A5%E5%91%8A.md" target="_blank" rel="noopener noreferrer">loopllm 技术报告 ↗</a></p>
 </div>

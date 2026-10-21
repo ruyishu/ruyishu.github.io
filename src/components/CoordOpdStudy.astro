@@ -1,0 +1,73 @@
+<div class="coord-study">
+  <section aria-labelledby="coord-question">
+    <div class="coord-heading"><span>01</span><h3 id="coord-question">研究问题：让坐标蒸馏感知区域几何</h3></div>
+    <p>高分辨率视觉问答依赖对局部证据的准确定位。标准 OPD 在学生自身生成的轨迹上对齐教师与学生的 token 分布，但这一目标并未显式编码坐标之间的空间关系：数字 token 的差异，无法直接表示两个区域在图像中有多接近。</p>
+    <p>Coord-OPD 保留标准 OPD，在坐标生成位置叠加 <strong>ROI loss</strong>。它将候选区域与教师参考区域的几何一致性转化为坐标数字的软监督，使区域定位与常规蒸馏共同优化。</p>
+  </section>
+
+  <section aria-labelledby="coord-method">
+    <div class="coord-heading"><span>02</span><h3 id="coord-method">方法：标准 OPD + ROI loss</h3></div>
+    <figure class="coord-figure">
+      <a href="/images/about/coordopd-roi-loss.svg" target="_blank" rel="noopener noreferrer" aria-label="放大查看 Coord-OPD 的双损失训练流程">
+        <picture>
+          <source media="(max-width: 600px)" srcset="/images/about/coordopd-roi-loss-narrow.svg" />
+          <img src="/images/about/coordopd-roi-loss.svg" width="1080" height="550" loading="lazy" alt="学生在图像和问题上生成自身轨迹。冻结教师在同一学生前缀上提供 token 分布，用于全 token 反向 KL；教师参考区域与候选坐标的 GIoU 形成几何软目标，再映射到学生坐标数字 token，计算附加 ROI loss。两项相加只更新学生。" />
+        </picture>
+      </a>
+      <figcaption>Figure 1 · 保留完整 OPD 蒸馏项，并在学生轨迹中的坐标数字位置加入区域几何监督。教师保持冻结，ROI 分支使用教师参考区域构造训练目标。</figcaption>
+    </figure>
+    <ol class="coord-method">
+      <li><h4>学生轨迹上的标准蒸馏</h4><p>学生自行采样回答与坐标序列；冻结教师沿相同的学生文本前缀计算下一 token 分布。完整蒸馏项采用 KL(p<sub>student</sub> ‖ p<sub>teacher</sub>)，覆盖常规 OPD 的全部有效生成位置。</p></li>
+      <li><h4>从候选坐标到几何权重</h4><p>对当前坐标枚举 0–1000 的离散候选值。候选框由学生已生成的坐标、当前候选值及教师提供的剩余参考坐标组成；依据候选框与教师参考框的 GIoU，以 exp(GIoU / τ) 构造权重。</p></li>
+      <li><h4>将几何目标映射到数字 token</h4><p>沿学生当前数字前缀聚合候选权重，得到下一个数字及数值结束符的目标分布 q<sub>geo</sub>，再以 KL(q<sub>geo</sub> ‖ p<sub>student</sub>) 形成 ROI loss。目标基于完整数值的几何关系，因此能够处理 299 → 300 这类跨位数变化。</p></li>
+    </ol>
+    <div class="coord-objective">
+      <strong>L = L<sub>OPD</sub> + λ · L<sub>ROI</sub></strong>
+      <span>全 token 蒸馏 + 坐标数字位置的几何监督</span>
+    </div>
+    <p class="coord-fine">ROI 项在坐标动作内汇总；λ 与 τ 分别控制损失权重和几何目标的温度。两个 KL 项的方向由各自的训练目标决定。</p>
+  </section>
+
+  <section aria-labelledby="coord-results">
+    <div class="coord-heading"><span>03</span><h3 id="coord-results">实验结果</h3></div>
+    <div class="coord-result">
+      <div class="coord-number"><strong>≈ +3.5 <small>pp</small></strong><span>相对常规 OPD 的平均提升</span></div>
+      <div class="coord-result-copy"><p>在 <strong>V*</strong>、<strong>HR-Bench 4K</strong> 等高分辨率视觉评测上，<strong>Coord-OPD 相较常规 OPD 平均提升约 3.5 个百分点</strong>。完成 ROI loss 设计、训练实现与实验调优，验证了将区域几何关系引入坐标蒸馏的有效性。</p><p>核心贡献：在标准 OPD 框架内，通过附加 ROI 目标强化细粒度视觉定位。</p></div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .coord-study { display: grid; gap: 1.7rem; min-width: 0; width: 100%; }
+  .coord-study section { min-width: 0; padding-top: 1.15rem; border-top: 1px solid var(--color-border); }
+  .coord-heading { display: flex; align-items: baseline; gap: .75rem; margin-bottom: .6rem; }
+  .coord-heading > span { font: .72rem var(--font-mono); color: var(--color-accent); }
+  .coord-heading h3 { font-size: 1.1rem; margin: 0; color: var(--color-text-main); }
+  .coord-study section > p, .coord-method p { font-size: .9rem; line-height: 1.8; color: var(--color-text-muted); margin: .5rem 0 .8rem; }
+  .coord-study strong { color: var(--color-text-main); }
+  .coord-figure { margin: 1rem 0 1.3rem; }
+  .coord-figure a { display: block; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; background: #fff; }
+  .coord-figure img { display: block; width: 100%; height: auto; }
+  .coord-figure figcaption { font-size: .76rem; line-height: 1.7; color: var(--color-text-muted); margin: .7rem 0 0; }
+  .coord-method { list-style: none; counter-reset: method; padding: 0; margin: 0; }
+  .coord-method li { display: grid; grid-template-columns: 13rem 1fr; gap: 1.4rem; border-top: 1px dashed var(--color-border); padding: .8rem 0; }
+  .coord-method h4 { margin: .2rem 0; font-size: .88rem; color: var(--color-text-main); }
+  .coord-method h4::before { counter-increment: method; content: '0' counter(method) ' / '; color: var(--color-accent); font: .72rem var(--font-mono); }
+  .coord-method p { margin: 0; font-size: .85rem; }
+  .coord-objective { display: flex; flex-wrap: wrap; gap: .7rem 1.5rem; align-items: baseline; background: var(--color-surface); border-left: 2px solid var(--color-accent); padding: 1rem 1.1rem; }
+  .coord-objective strong { font-size: 1.15rem; }
+  .coord-objective > span { font-size: .78rem; color: var(--color-text-muted); }
+  .coord-study section > .coord-fine { font-size: .75rem; color: var(--color-text-dim); margin: .7rem 0 0; }
+  .coord-result { display: grid; grid-template-columns: minmax(13rem, 1fr) 2fr; gap: 2rem; padding: 1.2rem 0 .3rem; }
+  .coord-number { display: flex; flex-direction: column; gap: .35rem; }
+  .coord-number strong { font-size: 2.8rem; letter-spacing: -.05em; line-height: 1.25; color: var(--color-accent); white-space: nowrap; }
+  .coord-number small { font-size: 1.15rem; letter-spacing: 0; }
+  .coord-number span { font-size: .76rem; color: var(--color-text-muted); }
+  .coord-result-copy p { font-size: .88rem; line-height: 1.8; color: var(--color-text-muted); margin: 0 0 .5rem; }
+  .coord-result-copy p + p { font-size: .77rem; color: var(--color-text-dim); }
+  @media (max-width: 640px) {
+    .coord-method li { grid-template-columns: 1fr; gap: .35rem; }
+    .coord-result { grid-template-columns: 1fr; gap: 1rem; }
+    .coord-heading h3 { font-size: 1rem; }
+  }
+</style>

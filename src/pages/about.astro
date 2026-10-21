@@ -4,6 +4,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import PaperFigure from '../components/PaperFigure.astro';
+import WenxinRlvr from '../components/WenxinRlvr.astro';
+import CoordOpdStudy from '../components/CoordOpdStudy.astro';
 import LoopLlmStudy from '../components/LoopLlmStudy.astro';
 import AALeaderboard from '../components/AALeaderboard.astro';
 import { BENCH_URL, PAGE_ACCESS, SITE_TITLE } from '../consts';
@@ -276,115 +278,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				margin-bottom: 1.25rem;
 			}
 
-			.paper-draft {
-				display: flex;
-				flex-direction: column;
-				gap: 1.7rem;
-				margin-top: 0.3rem;
-			}
-
-			.paper-stage {
-				padding-top: 1.1rem;
-				border-top: 1px solid var(--color-border);
-			}
-
-			.paper-stage-head {
-				display: flex;
-				align-items: baseline;
-				flex-wrap: wrap;
-				gap: 0.75rem;
-				margin-bottom: 0.85rem;
-			}
-
-			.paper-stage-head h3 {
-				margin: 0;
-				font-size: 1.12rem;
-				color: var(--color-text-main);
-			}
-
-			.paper-stage-index,
-			.paper-stage-status {
-				font-family: var(--font-mono);
-				font-size: 0.72rem;
-				color: var(--color-accent);
-			}
-
-			.paper-stage-status {
-				margin-left: auto;
-			}
-
-			.paper-copy p,
-			.paper-item p {
-				margin: 0 0 0.75rem;
-				font-size: 0.9rem;
-				line-height: 1.75;
-				color: var(--color-text-muted);
-			}
-
-			.paper-copy p:last-child,
-			.paper-item p:last-child {
-				margin-bottom: 0;
-			}
-
-			.paper-items {
-				display: flex;
-				flex-direction: column;
-				gap: 0.85rem;
-			}
-
-			.paper-item {
-				display: grid;
-				grid-template-columns: minmax(11rem, 0.8fr) minmax(0, 2fr);
-				gap: 1.1rem;
-				padding: 0.9rem 1rem;
-				border: 1px solid var(--color-border);
-				border-radius: 8px;
-				background: var(--color-surface);
-			}
-
-			.paper-item h4 {
-				margin: 0;
-				font-size: 0.88rem;
-				line-height: 1.5;
-				color: var(--color-text-main);
-			}
-
-			.paper-objective,
-			.paper-draft-note {
-				margin: 0.95rem 0 0;
-				padding: 0.85rem 1rem;
-				border-left: 2px solid var(--color-accent);
-				background: var(--color-surface);
-				font-size: 0.82rem;
-				line-height: 1.7;
-				color: var(--color-text-muted);
-			}
-
-			.paper-draft-note {
-				margin-top: 0;
-			}
-
-			.speedopd-figure {
-				margin: 1.1rem 0 1.35rem;
-				padding: 0.85rem;
-				border: 1px solid var(--color-border);
-				border-radius: 10px;
-				background: #fff;
-			}
-
-			.speedopd-figure img {
-				display: block;
-				width: 100%;
-				height: auto;
-			}
-
-			.speedopd-figure figcaption {
-				margin: 0.75rem 0.2rem 0.15rem;
-				font-size: 0.8rem;
-				line-height: 1.7;
-				color: var(--color-text-muted);
-			}
-
 			/* ---------- 时间线 ---------- */
 			.timeline {
 				display: flex;
@@ -608,10 +501,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 				font-weight: 650;
 			}
 
-			.speedopd-results tbody tr:last-child td:not(:first-child) {
-				color: var(--color-text-dim);
-				font-weight: 500;
-			}
 
 			/* ---------- 响应式 ---------- */
 			@media (max-width: 1100px) {
@@ -631,11 +520,6 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 			@media (max-width: 640px) {
 				main {
 					padding: 1.5rem 1.1rem 4rem 1.1rem;
-				}
-
-				.paper-item {
-					grid-template-columns: 1fr;
-					gap: 0.35rem;
 				}
 
 				.slide {
@@ -770,7 +654,7 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 
 								{(experience.figure || experience.results) && (
 									<div class="exp-extra">
-										{experience.figure && (
+										{experience.figure?.kind === 'mmrl' ? <WenxinRlvr /> : experience.figure && (
 											<PaperFigure
 												kind={experience.figure.kind}
 												caption={experience.figure.caption}
@@ -826,72 +710,8 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 							<LoopLlmStudy />
 						) : project.slug === 'bench' ? (
 							<AALeaderboard />
-						) : project.paperDraft ? (
-							<div class="paper-draft">
-								<div class="paper-stage">
-									<div class="paper-stage-head">
-										<span class="paper-stage-index">01</span>
-										<h3>Motivation · 音频加速后的准确率退化</h3>
-										<span class="paper-stage-status">已观察</span>
-									</div>
-									<div class="paper-copy">
-										{project.paperDraft.motivation.map((paragraph) => <p>{paragraph}</p>)}
-									</div>
-									<figure class="speedopd-figure">
-										<img src="/images/about/speedopd-motivation.svg?v=3" alt="Qwen2.5-Omni-7B 的实测固定倍速准确率：TAU 1 倍速 66.5%、2 倍速 57.0%、3 倍速 48.5%；GTZAN 分别为 100.0%、95.0%、85.0%。" loading="lazy" />
-										<figcaption>Figure 1 · 加速退化的两个观察：TAU 为每组 200 条的两组 seed 均值；GTZAN 为 60 条的单组探索结果，3× 差异经 Holm 校正后未达显著性（p=0.113）。</figcaption>
-									</figure>
-									{project.metrics && (
-										<div class="metric-grid">
-											{project.metrics.map((metric) => (
-												<div class="metric-card">
-													<span class="metric-value">{metric.value}</span>
-													<span class="metric-label">{metric.label}</span>
-												</div>
-											))}
-										</div>
-									)}
-								</div>
-								<div class="paper-stage">
-									<div class="paper-stage-head">
-										<span class="paper-stage-index">02</span>
-										<h3>Method · Audio-Adaptive Cross-Rate OPD</h3>
-									</div>
-									<figure class="speedopd-figure">
-										<img src="/images/about/speedopd-method.png" alt="Audio-Adaptive Cross-Rate OPD 框架：1 倍速原音频交给冻结教师，变速音频交给学生；学生产生回答前缀并提供共同上下文，教师和学生 logits 进入自适应门控 KL，结合答案监督与原速率保持损失训练。" loading="lazy" />
-										<figcaption>Figure 2 · SpeedOPD：音频自适应跨速率 On-Policy Distillation 框架。</figcaption>
-									</figure>
-									<div class="paper-items">
-										{project.paperDraft.method.map((item) => (
-											<div class="paper-item">
-												<h4>{item.name}</h4>
-												<p>{item.detail}</p>
-											</div>
-										))}
-									</div>
-									<p class="paper-objective">{project.paperDraft.objective}</p>
-								</div>
-								<div class="paper-stage">
-									<div class="paper-stage-head">
-										<span class="paper-stage-index">03</span>
-										<h3>Results · 模型与 benchmark 对照</h3>
-										<span class="paper-stage-status">评测结果</span>
-									</div>
-									<div class="result-table result-table--compact speedopd-results">
-										<h4 class="result-table-title">Table 1 · 固定倍速基线与 SpeedOPD</h4>
-										<table>
-											<thead>
-												<tr>{project.paperDraft.results.cols.map((col) => <th>{col}</th>)}</tr>
-											</thead>
-											<tbody>
-												{project.paperDraft.results.rows.map((row) => (
-													<tr>{row.map((cell) => <td>{cell}</td>)}</tr>
-												))}
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
+						) : project.slug === 'coordopd' ? (
+							<CoordOpdStudy />
 						) : (
 							<>
 								{project.metrics && (
@@ -912,7 +732,7 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 							</>
 						)}
 
-						{!project.paperDraft && (
+						{project.tags && (
 							<div class="tag-row">
 								{project.tags.map((tag) => <span class="tag">{tag}</span>)}
 							</div>
