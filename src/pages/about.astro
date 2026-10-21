@@ -21,6 +21,11 @@ const slides = [
 ];
 
 const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id === id) + 1).padStart(2, '0');
+
+// 图号跨经历连续编号（百度有两张图，平安一张）。
+const figureOffsets = EXPERIENCES.map((_, i) =>
+	EXPERIENCES.slice(0, i).reduce((total, item) => total + (item.figures?.length ?? 0), 0),
+);
 ---
 
 <!doctype html>
@@ -651,18 +656,18 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 
 								</div>
 
-								{(experience.figure || experience.results) && (
+								{(experience.figures?.length || experience.results) && (
 									<div class="exp-extra">
-										{experience.figure && (
+										{experience.figures?.map((figure, figureIndex) => (
 											<PaperFigure
-												kind={experience.figure.kind}
-												caption={experience.figure.caption}
-												index={index + 1}
+												kind={figure.kind}
+												caption={figure.caption}
+												index={figureOffsets[index] + figureIndex + 1}
 											/>
-										)}
+										))}
 
 										{experience.results && (
-											<div class={experience.figure?.kind === 'tooluse' ? 'result-table result-table--compact' : 'result-table'}>
+											<div class={experience.figures?.[0]?.kind === 'tooluse' ? 'result-table result-table--compact' : 'result-table'}>
 												{experience.results.title && <h4 class="result-table-title">{experience.results.title}</h4>}
 												<table>
 													<thead>

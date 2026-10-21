@@ -1,8 +1,9 @@
 ---
 // 论文风格的方法示意图。
-// kind: 'tooluse'（平安 · 工具调用闭环）/ 'mmrl'（百度 · 多模态 RLVR 视觉感知目标）
+// kind: 'tooluse'（平安 · 工具调用闭环）/ 'mmrl'（百度 · 遮图反事实视觉感知目标）
+//       / 'rlvrdata'（百度 · 多模态 RLVR 数据流水线，位图）
 interface Props {
-	kind: 'tooluse' | 'mmrl';
+	kind: 'tooluse' | 'mmrl' | 'rlvrdata';
 	caption: string;
 	index: number;
 }
@@ -43,6 +44,21 @@ const headId = `fig-head-${kind}`;
 			/>
 		)
 	}
+	{
+		kind === 'rlvrdata' && (
+			<img
+				class="fig-raster"
+				src="/images/about/multimodal-rlvr-data-pipeline.png"
+				alt={caption}
+				width="1600"
+				height="680"
+				loading="lazy"
+				decoding="async"
+				style="display:block;width:100%;max-width:1180px;height:auto;margin-inline:auto;border:1px solid var(--color-border);border-radius:8px;background:#fff;"
+			/>
+		)
+	}
+	{kind !== 'rlvrdata' && (
 	<svg
 		class="fig-svg fig-svg--hidden"
 		hidden
@@ -185,6 +201,7 @@ const headId = `fig-head-${kind}`;
 			)
 		}
 	</svg>
+	)}
 
 	<figcaption class="fig-caption">
 		<span class="fig-label">Figure {index}</span>

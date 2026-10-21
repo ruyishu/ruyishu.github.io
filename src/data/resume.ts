@@ -25,7 +25,7 @@ export interface ResumeProject {
 }
 
 export interface ResumeFigure {
-	kind: 'tooluse' | 'mmrl';
+	kind: 'tooluse' | 'mmrl' | 'rlvrdata';
 	caption: string;
 }
 
@@ -42,7 +42,7 @@ export interface ResumeExperience {
 	needsInput?: boolean;
 	bullets: string[];
 	tags?: string[];
-	figure?: ResumeFigure;
+	figures?: ResumeFigure[];
 	results?: ResultTable;
 }
 
@@ -68,16 +68,24 @@ export const EXPERIENCES: ResumeExperience[] = [
 		role: '多模态大模型算法工程师（实习）',
 		period: '2025.06 – 2025.10',
 		bullets: [
-			'日常工作聚焦多模态 RLVR 训练数据 pipeline：从任务拆分、样本清洗与格式统一，到可验证信号构造、质量筛选和训练集迭代。',
-			'针对模型依赖文本先验、没有真正使用图像证据的问题，构造原图与遮图反事实双分支：复用同一条 rollout，在共享 policy 下分别计算 token logits，并以两种视觉条件的 KL 散度形成 implicit perception objective。',
-			'将视觉感知目标直接并入 RLVR optimization objective，在保持可验证答案奖励的同时强化视觉依赖；训练后按 benchmark 与各自 best model 对比，判断图文理解和推理能力是否真实改善。',
+			'负责多模态 RLVR 的训练数据 pipeline：从近百万条无标图文 query 起步，先按可验证性与图文相关性剔除开放题、主观题和「贴张图问一道无关题」的样本，再抽 200 条人工校准 prompt 与采样参数（temperature / top-p），把过滤的 precision 与 recall 对齐后冻结配置。',
+			'用 Pass@K 先给题目分难度，再让 6 个 Think 模型分档 rollout：简单题要求 5/6 答案一致才采纳，难题放宽到 3/6。没有人工标注，参考答案就是这套分层一致率反推出来的弱标签。',
+			'产物做两层清洗：先按答案 Acc 对照参考答案过滤，再用 LLM-as-Judge 审 CoT 过程，剔除复读死循环、前后矛盾、算错硬凑与无依据跳步，最后得到可直接进后训练的多模态数据集。',
+			'另一条线做视觉感知：复用同一条 rollout，在原图与遮图两种条件下各算一次 token logits，用两者的 KL 散度构造隐式感知项，以 λ 加权并入 RLVR 目标。reward 仍只由可验证答案给出，KL 不参与奖励计算，只约束策略对图像的依赖。',
 		],
-		tags: ['Multimodal RLVR', 'Data Pipeline', 'Data Curation', 'Failure Analysis', 'Evaluation'],
-		figure: {
-			kind: 'mmrl',
-			caption:
-				'基于遮图反事实的视觉感知优化。先由原图分支生成 rollout，再在共享 policy 下复用同一 token 序列，对比原图与遮图条件下的 logits 分布；最大化两者的 KL 感知差异，并与可验证答案奖励共同进入 RLVR objective，从而抑制语言先验捷径、强化视觉证据依赖。',
-		},
+		tags: ['Multimodal RLVR', 'Data Pipeline', 'Pass@K', 'LLM-as-Judge', 'Visual Perception'],
+		figures: [
+			{
+				kind: 'rlvrdata',
+				caption:
+					'多模态 RLVR 数据流水线：近百万条无标图文 query 先过可验证性与图文相关性门控，200 题人工校准把 prompt 与采样参数的 precision / recall 对齐；再按 Pass@K 分难度，由 6 个 Think 模型分档 rollout，以 5/6 与 3/6 的答案一致率锁定参考答案；最后按答案 Acc 与 CoT 过程做双层清洗。',
+			},
+			{
+				kind: 'mmrl',
+				caption:
+					'基于遮图反事实的视觉感知优化：复用同一条 rollout，在共享 policy 下分别计算原图与遮图的 token logits，以 KL 散度构造隐式感知项并加权并入 RLVR 目标。训练时的 reward 仍只来自可验证答案，KL 项不进入奖励计算。',
+			},
+		],
 		results: {
 			title: '多模态 RLVR 评测结果',
 			cols: ['模型 / 训练阶段', 'MathVista', 'MathVision', 'MathVerse', 'LogicVista', 'Like56', 'STEM200'],
@@ -98,11 +106,13 @@ export const EXPERIENCES: ResumeExperience[] = [
 			'基于 GRPO 设计工具名称、参数正确性、调用顺序与工具使用率等多维奖励，配合 T-Eval、BFCL 和内部基准形成训练评测闭环。',
 		],
 		tags: ['Tool Calling', 'Full-parameter SFT', 'GRPO', 'TRL / OpenRLHF', 'Evaluation'],
-		figure: {
-			kind: 'tooluse',
-			caption:
-				'统一工具 schema 并构造高质量语料，通过全量 SFT 完成能力注入，再以 GRPO 奖励约束名称、参数与调用顺序；失败样本按类型回流到下一轮数据。',
-		},
+		figures: [
+			{
+				kind: 'tooluse',
+				caption:
+					'统一工具 schema 并构造高质量语料，通过全量 SFT 完成能力注入，再以 GRPO 奖励约束名称、参数与调用顺序；失败样本按类型回流到下一轮数据。',
+			},
+		],
 		results: {
 			title: '工具调用评测结果',
 			cols: ['模型 / 训练阶段', 'T-Eval', 'BFCL-v2', 'Pingan-700'],
