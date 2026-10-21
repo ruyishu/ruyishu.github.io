@@ -29,10 +29,40 @@
 
   <section aria-labelledby="coord-results">
     <div class="coord-heading"><span>03</span><h3 id="coord-results">实验结果</h3></div>
-    <div class="coord-result">
-      <div class="coord-number"><strong>≈ +3.5 <small>pp</small></strong><span>相对常规 OPD 的平均提升</span></div>
-      <div class="coord-result-copy"><p>在 <strong>V*</strong>、<strong>HR-Bench 4K</strong> 等高分辨率视觉评测上，<strong>Coord-OPD 相较常规 OPD 平均提升约 3.5 个百分点</strong>。完成 ROI loss 设计、训练实现与实验调优，验证了将区域几何关系引入坐标蒸馏的有效性。</p><p>核心贡献：在标准 OPD 框架内，通过附加 ROI 目标强化细粒度视觉定位。</p></div>
+    <p>以 Qwen3-VL-8B 为教师、Qwen3-VL-2B 为学生，在统一 1MP 像素预算、最多 3 次裁剪的评测协议下对比四个高分辨率视觉问答基准。标准 OPD 先把教师「先裁剪、再作答」的多轮视觉交互能力迁移到 2B；在此基础上叠加坐标位置的 ROI loss，四榜准确率进一步平均提升约 3.5 个百分点。</p>
+    <div class="coord-table-wrap">
+      <table class="coord-table">
+        <caption>四个高分辨率视觉评测上的问答准确率（%）；V* 与 TreeBench 为逐题准确率，HR-Bench 为 200 题组四轮选项轮换均值</caption>
+        <thead>
+          <tr>
+            <th>模型 / 训练阶段</th>
+            <th>V*<br /><span>191 题</span></th>
+            <th>TreeBench<br /><span>405 题</span></th>
+            <th>HR-Bench 4K<br /><span>200 题组</span></th>
+            <th>HR-Bench 8K<br /><span>200 题组</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Qwen3-VL-8B 教师</th>
+            <td>74.9</td><td>41.5</td><td>77.5</td><td>68.5</td>
+          </tr>
+          <tr>
+            <th scope="row">Qwen3-VL-2B 起点</th>
+            <td>52.9</td><td>27.2</td><td>56.1</td><td>49.3</td>
+          </tr>
+          <tr>
+            <th scope="row">+ 标准 OPD</th>
+            <td>69.6</td><td>35.6</td><td>65.9</td><td>57.9</td>
+          </tr>
+          <tr class="coord-baseline">
+            <th scope="row">+ Coord-OPD（OPD + ROI loss）</th>
+            <td>72.9</td><td>39.1</td><td>69.7</td><td>61.3</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+    <p>完成 ROI loss 设计、训练实现与多榜评测验证：在标准 OPD 框架内引入基于 GIoU 的坐标数字软监督，将区域几何一致性注入坐标 token 训练，使 2B 学生在高分辨率局部证据定位与问答上逼近 8B 教师表现。</p>
   </section>
 </div>
 
@@ -59,17 +89,21 @@
   .coord-objective strong { font-size: 1.15rem; }
   .coord-objective > span { font-size: .78rem; color: var(--color-text-muted); }
   .coord-study section > .coord-fine { font-size: .75rem; color: var(--color-text-dim); margin: .7rem 0 0; }
-  .coord-result { display: grid; grid-template-columns: minmax(13rem, 1fr) 2fr; gap: 2rem; padding: 1.2rem 0 .3rem; }
-  .coord-number { display: flex; flex-direction: column; gap: .35rem; }
-  .coord-number strong { font-size: 2.8rem; letter-spacing: -.05em; line-height: 1.25; color: var(--color-accent); white-space: nowrap; }
-  .coord-number small { font-size: 1.15rem; letter-spacing: 0; }
-  .coord-number span { font-size: .76rem; color: var(--color-text-muted); }
-  .coord-result-copy p { font-size: .88rem; line-height: 1.8; color: var(--color-text-muted); margin: 0 0 .5rem; }
-  .coord-result-copy p + p { font-size: .77rem; color: var(--color-text-dim); }
+  .coord-table-wrap { overflow-x: auto; margin: 1rem 0 .4rem; }
+  .coord-table { width: 100%; min-width: 42rem; border-collapse: collapse; font-size: .84rem; margin: 0; }
+  .coord-table caption { padding: 0 0 .45rem; text-align: left; font-size: .78rem; color: var(--color-text-dim); }
+  .coord-table thead th { padding: .55rem .7rem .6rem; background: var(--color-surface); border-bottom: 1px solid var(--color-border); text-align: right; font-size: .73rem; font-weight: 600; line-height: 1.45; color: var(--color-text-dim); white-space: nowrap; }
+  .coord-table thead th span { display: inline-block; margin-top: .15rem; font-size: .68rem; font-weight: 400; color: var(--color-text-dim); opacity: .8; }
+  .coord-table tbody th, .coord-table tbody td { padding: .62rem .7rem; border-bottom: 1px dashed var(--color-border); text-align: right; font-size: .84rem; font-variant-numeric: tabular-nums; color: var(--color-text-muted); white-space: nowrap; }
+  .coord-table thead th:first-child, .coord-table tbody th { text-align: left; }
+  .coord-table tbody th { font-weight: 500; color: var(--color-text-main); }
+  .coord-table tbody tr.coord-baseline th, .coord-table tbody tr.coord-baseline td { color: var(--color-accent); font-weight: 650; }
+  .coord-notes { list-style: none; padding: 0; margin: .7rem 0 0; display: grid; gap: .3rem; }
+  .coord-notes li { position: relative; padding-left: .9rem; font-size: .74rem; line-height: 1.7; color: var(--color-text-dim); }
+  .coord-notes li::before { content: '·'; position: absolute; left: .25rem; color: var(--color-accent); }
   @media (max-width: 640px) {
     .coord-figure-scroll a { min-width: 880px; }
     .coord-method li { grid-template-columns: 1fr; gap: .35rem; }
-    .coord-result { grid-template-columns: 1fr; gap: 1rem; }
     .coord-heading h3 { font-size: 1rem; }
   }
 </style>
