@@ -68,15 +68,15 @@ export const EXPERIENCES: ResumeExperience[] = [
 		role: '多模态大模型算法工程师（实习）',
 		period: '2025.06 – 2025.10',
 		bullets: [
-			'参与多模态 RLVR 数据筛选与训练集迭代，围绕任务定义、图文清洗、可验证标签、难度诊断和数据配比组织训练数据，并通过失败样本分析定位质量问题。',
-			'针对模型难以定位问题相关视觉证据的瓶颈，构建“先定位关键区域、再基于区域证据回答”的训练过程，使模型在作答前显式识别应关注的位置。',
-			'在可验证答案奖励之外，引入预测区域与参考区域的 IoU（交并比）定位奖励，将“找对位置”与“答对问题”共同纳入 RLVR 优化；通过多模态基准评测观察定位监督对理解与推理表现的影响。',
+			'日常工作聚焦多模态 RLVR 训练数据 pipeline：从任务拆分、样本清洗与格式统一，到可验证信号构造、质量筛选和训练集迭代。',
+			'针对模型依赖文本先验、没有真正使用图像证据的问题，构造原图与遮图反事实双分支：复用同一条 rollout，在共享 policy 下分别计算 token logits，并以两种视觉条件的 KL 散度形成 implicit perception objective。',
+			'将视觉感知目标直接并入 RLVR optimization objective，在保持可验证答案奖励的同时强化视觉依赖；训练后按 benchmark 与各自 best model 对比，判断图文理解和推理能力是否真实改善。',
 		],
-		tags: ['Multimodal RLVR', 'Data Curation', 'Visual Grounding', 'IoU Reward', 'Evaluation'],
+		tags: ['Multimodal RLVR', 'Data Pipeline', 'Data Curation', 'Failure Analysis', 'Evaluation'],
 		figure: {
 			kind: 'mmrl',
 			caption:
-				'问题驱动的视觉定位：模型先预测关键区域，再生成答案；训练时以区域 IoU 奖励和可验证答案奖励共同优化策略。',
+				'基于遮图反事实的视觉感知优化。先由原图分支生成 rollout，再在共享 policy 下复用同一 token 序列，对比原图与遮图条件下的 logits 分布；最大化两者的 KL 感知差异，并与可验证答案奖励共同进入 RLVR objective，从而抑制语言先验捷径、强化视觉证据依赖。',
 		},
 		results: {
 			title: '多模态 RLVR 评测结果',
@@ -84,7 +84,7 @@ export const EXPERIENCES: ResumeExperience[] = [
 			rows: [
 				['Qwen2.5-VL-7B-Instruct', '68.2', '25.1', '41.1', '45.6', '63.0', '54.0'],
 				['+ 标准 GRPO', '74.0', '31.8', '46.0', '51.0', '69.3', '61.1'],
-				['+ IoU 定位奖励', '76.6', '35.4', '48.9', '53.8', '72.5', '63.5'],
+				['+ 视觉感知增强', '76.6', '35.4', '48.9', '53.8', '72.5', '63.5'],
 			],
 		},
 	},

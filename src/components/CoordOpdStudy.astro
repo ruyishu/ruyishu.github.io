@@ -8,13 +8,12 @@
   <section aria-labelledby="coord-method">
     <div class="coord-heading"><span>02</span><h3 id="coord-method">方法：标准 OPD + ROI loss</h3></div>
     <figure class="coord-figure">
-      <a href="/images/about/coordopd-roi-loss.svg" target="_blank" rel="noopener noreferrer" aria-label="放大查看 Coord-OPD 的双损失训练流程">
-        <picture>
-          <source media="(max-width: 600px)" srcset="/images/about/coordopd-roi-loss-narrow.svg" />
-          <img src="/images/about/coordopd-roi-loss.svg" width="1080" height="550" loading="lazy" alt="学生在图像和问题上生成自身轨迹。冻结教师在同一学生前缀上提供 token 分布，用于全 token 反向 KL；教师参考区域与候选坐标的 GIoU 形成几何软目标，再映射到学生坐标数字 token，计算附加 ROI loss。两项相加只更新学生。" />
-        </picture>
-      </a>
-      <figcaption>Figure 1 · 保留完整 OPD 蒸馏项，并在学生轨迹中的坐标数字位置加入区域几何监督。教师保持冻结，ROI 分支使用教师参考区域构造训练目标。</figcaption>
+      <div class="coord-figure-scroll">
+        <a href="/images/about/coordopd-fig3-roi.png" target="_blank" rel="noopener noreferrer" aria-label="放大查看论文 Figure 3：Coord-OPD 整体架构">
+          <img src="/images/about/coordopd-fig3-roi.png" width="1774" height="887" loading="lazy" alt="论文 Figure 3 的三部分整体架构：学生通过自回归坐标进行视觉交互；冻结教师和学生在匹配的学生历史上计算分布；完整 OPD 损失与基于 GIoU 候选权重的坐标数字 ROI 损失共同更新学生。" />
+        </a>
+      </div>
+      <figcaption>Figure 3 · Coord-OPD 整体架构。学生自主生成交互轨迹，教师在匹配的学生上下文上提供监督；标准 OPD 与坐标数字位置的 ROI loss 联合优化，仅更新学生参数。<a class="coord-original" href="/images/about/coordopd-fig3-roi.png" target="_blank" rel="noopener noreferrer">查看原图 ↗</a></figcaption>
     </figure>
     <ol class="coord-method">
       <li><h4>学生轨迹上的标准蒸馏</h4><p>学生自行采样回答与坐标序列；冻结教师沿相同的学生文本前缀计算下一 token 分布。完整蒸馏项采用 KL(p<sub>student</sub> ‖ p<sub>teacher</sub>)，覆盖常规 OPD 的全部有效生成位置。</p></li>
@@ -46,7 +45,9 @@
   .coord-study section > p, .coord-method p { font-size: .9rem; line-height: 1.8; color: var(--color-text-muted); margin: .5rem 0 .8rem; }
   .coord-study strong { color: var(--color-text-main); }
   .coord-figure { margin: 1rem 0 1.3rem; }
-  .coord-figure a { display: block; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; background: #fff; }
+  .coord-figure-scroll { overflow-x: auto; }
+  .coord-figure-scroll a { display: block; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; background: #fff; }
+  .coord-original { white-space: nowrap; margin-left: .5rem; }
   .coord-figure img { display: block; width: 100%; height: auto; }
   .coord-figure figcaption { font-size: .76rem; line-height: 1.7; color: var(--color-text-muted); margin: .7rem 0 0; }
   .coord-method { list-style: none; counter-reset: method; padding: 0; margin: 0; }
@@ -66,6 +67,7 @@
   .coord-result-copy p { font-size: .88rem; line-height: 1.8; color: var(--color-text-muted); margin: 0 0 .5rem; }
   .coord-result-copy p + p { font-size: .77rem; color: var(--color-text-dim); }
   @media (max-width: 640px) {
+    .coord-figure-scroll a { min-width: 880px; }
     .coord-method li { grid-template-columns: 1fr; gap: .35rem; }
     .coord-result { grid-template-columns: 1fr; gap: 1rem; }
     .coord-heading h3 { font-size: 1rem; }

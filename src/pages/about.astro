@@ -4,7 +4,6 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import PaperFigure from '../components/PaperFigure.astro';
-import WenxinRlvr from '../components/WenxinRlvr.astro';
 import CoordOpdStudy from '../components/CoordOpdStudy.astro';
 import LoopLlmStudy from '../components/LoopLlmStudy.astro';
 import AALeaderboard from '../components/AALeaderboard.astro';
@@ -654,7 +653,7 @@ const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id 
 
 								{(experience.figure || experience.results) && (
 									<div class="exp-extra">
-										{experience.figure?.kind === 'mmrl' ? <WenxinRlvr /> : experience.figure && (
+										{experience.figure && (
 											<PaperFigure
 												kind={experience.figure.kind}
 												caption={experience.figure.caption}
