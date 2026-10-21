@@ -34,10 +34,10 @@ const headId = `fig-head-${kind}`;
 		kind === 'mmrl' && (
 			<img
 				class="fig-raster"
-				src="/images/about/multimodal-rlvr-perception-objective-v3.png"
+				src="/images/about/multimodal-rlvr-iou-reward.png"
 				alt={caption}
-				width="2060"
-				height="763"
+				width="1600"
+				height="680"
 				loading="lazy"
 				decoding="async"
 				style="display:block;width:100%;max-width:1080px;height:auto;margin-inline:auto;border:1px solid var(--color-border);border-radius:8px;background:#fff;"
@@ -58,7 +58,7 @@ const headId = `fig-head-${kind}`;
 			/>
 		)
 	}
-	{kind !== 'rlvrdata' && (
+	{kind === 'tooluse' && (
 	<svg
 		class="fig-svg fig-svg--hidden"
 		hidden

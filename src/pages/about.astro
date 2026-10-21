@@ -23,8 +23,11 @@ const slides = [
 const slideNumber = (id: string) => String(slides.findIndex((slide) => slide.id === id) + 1).padStart(2, '0');
 
 // 图号跨经历连续编号（百度有两张图，平安一张）。
+const countFigures = (item: (typeof EXPERIENCES)[number]) =>
+	item.blocks ? item.blocks.filter((block) => block.figure).length : (item.figures?.length ?? 0);
+
 const figureOffsets = EXPERIENCES.map((_, i) =>
-	EXPERIENCES.slice(0, i).reduce((total, item) => total + (item.figures?.length ?? 0), 0),
+	EXPERIENCES.slice(0, i).reduce((total, item) => total + countFigures(item), 0),
 );
 ---
 
@@ -445,6 +448,18 @@ const figureOffsets = EXPERIENCES.map((_, i) =>
 				margin-top: 0.25rem;
 			}
 
+			.exp-block {
+				min-width: 0;
+				margin-top: 0.9rem;
+			}
+
+			.exp-block-text {
+				margin: 0 0 0.2rem;
+				font-size: 0.88rem;
+				line-height: 1.85;
+				color: var(--color-text-muted);
+			}
+
 			.result-table {
 				margin-top: 1rem;
 				overflow-x: auto;
@@ -641,11 +656,26 @@ const figureOffsets = EXPERIENCES.map((_, i) =>
 										</div>
 									</div>
 									<div class="tl-role">{experience.role}</div>
-									<ul class="bullet-list">
-										{experience.bullets.map((bullet) => (
-											<li>{bullet}</li>
-										))}
-									</ul>
+									{experience.blocks ? (
+										experience.blocks.map((block, blockIndex) => (
+											<div class="exp-block">
+												<p class="exp-block-text">{block.text}</p>
+												{block.figure && (
+													<PaperFigure
+														kind={block.figure.kind}
+														caption={block.figure.caption}
+														index={figureOffsets[index] + blockIndex + 1}
+													/>
+												)}
+											</div>
+										))
+									) : (
+										<ul class="bullet-list">
+											{experience.bullets.map((bullet) => (
+												<li>{bullet}</li>
+											))}
+										</ul>
+									)}
 									{experience.tags && (
 										<div class="tag-row">
 											{experience.tags.map((tag) => (
@@ -656,9 +686,9 @@ const figureOffsets = EXPERIENCES.map((_, i) =>
 
 								</div>
 
-								{(experience.figures?.length || experience.results) && (
+								{((!experience.blocks && experience.figures?.length) || experience.results) && (
 									<div class="exp-extra">
-										{experience.figures?.map((figure, figureIndex) => (
+										{!experience.blocks && experience.figures?.map((figure, figureIndex) => (
 											<PaperFigure
 												kind={figure.kind}
 												caption={figure.caption}

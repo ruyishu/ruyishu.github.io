@@ -35,12 +35,18 @@ export interface ResultTable {
 	rows: string[][];
 }
 
+export interface ResumeBlock {
+	text: string;
+	figure?: ResumeFigure;
+}
+
 export interface ResumeExperience {
 	org: string;
 	role: string;
 	period: string;
 	needsInput?: boolean;
 	bullets: string[];
+	blocks?: ResumeBlock[];
 	tags?: string[];
 	figures?: ResumeFigure[];
 	results?: ResultTable;
@@ -67,25 +73,25 @@ export const EXPERIENCES: ResumeExperience[] = [
 		org: '百度深圳科技有限公司 · 文心多模态团队',
 		role: '多模态大模型算法工程师（实习）',
 		period: '2025.06 – 2025.10',
-		bullets: [
-			'负责多模态 RLVR 的训练数据 pipeline：从近百万条无标图文 query 起步，先按可验证性与图文相关性剔除开放题、主观题和「贴张图问一道无关题」的样本，再抽 200 条人工校准 prompt 与采样参数（temperature / top-p），把过滤的 precision 与 recall 对齐后冻结配置。',
-			'用 Pass@K 先给题目分难度，再让 6 个 Think 模型分档 rollout：简单题要求 5/6 答案一致才采纳，难题放宽到 3/6。没有人工标注，参考答案就是这套分层一致率反推出来的弱标签。',
-			'产物做两层清洗：先按答案 Acc 对照参考答案过滤，再用 LLM-as-Judge 审 CoT 过程，剔除复读死循环、前后矛盾、算错硬凑与无依据跳步，最后得到可直接进后训练的多模态数据集。',
-			'另一条线做视觉感知：复用同一条 rollout，在原图与遮图两种条件下各算一次 token logits，用两者的 KL 散度构造隐式感知项，以 λ 加权并入 RLVR 目标。reward 仍只由可验证答案给出，KL 不参与奖励计算，只约束策略对图像的依赖。',
-		],
-		tags: ['Multimodal RLVR', 'Data Pipeline', 'Pass@K', 'LLM-as-Judge', 'Visual Perception'],
-		figures: [
+		blocks: [
 			{
-				kind: 'rlvrdata',
-				caption:
-					'多模态 RLVR 数据流水线：近百万条无标图文 query 先过可验证性与图文相关性门控，200 题人工校准把 prompt 与采样参数的 precision / recall 对齐；再按 Pass@K 分难度，由 6 个 Think 模型分档 rollout，以 5/6 与 3/6 的答案一致率锁定参考答案；最后按答案 Acc 与 CoT 过程做双层清洗。',
+				text: '负责多模态 RLVR 的训练数据 pipeline：从近百万条无标图文 query 起步，先按可验证性与图文相关性剔除开放题、主观题和「贴张图问一道无关题」的样本；抽 200 条人工校准 prompt 与采样参数（temperature / top-p），把过滤的 precision 与 recall 对齐后冻结。再用 Pass@K 给题目分难度，6 个 Think 模型分档 rollout——简单题要 5/6 答案一致才采纳，难题放宽到 3/6，参考答案就是这套分层一致率反推出来的弱标签。最后按答案 Acc 与 CoT 过程双层清洗，剔除复读死循环、前后矛盾、算错硬凑与无依据跳步。',
+				figure: {
+					kind: 'rlvrdata',
+					caption:
+						'多模态 RLVR 数据流水线：近百万条无标图文 query 先过可验证性与图文相关性门控，200 题人工校准把 prompt 与采样参数的 precision / recall 对齐；再按 Pass@K 分难度，由 6 个 Think 模型分档 rollout，以 5/6 与 3/6 的答案一致率锁定参考答案；最后按答案 Acc 与 CoT 过程做双层清洗。',
+				},
 			},
 			{
-				kind: 'mmrl',
-				caption:
-					'基于遮图反事实的视觉感知优化：复用同一条 rollout，在共享 policy 下分别计算原图与遮图的 token logits，以 KL 散度构造隐式感知项并加权并入 RLVR 目标。训练时的 reward 仍只来自可验证答案，KL 项不进入奖励计算。',
+				text: '另一条线把定位做成奖励：模型在作答前先输出关键区域的坐标（ROI），与标注框计算 IoU，作为可验证答案之外的额外 reward 并入 RLVR。这类题答得对不对，很大程度上取决于框得准不准——一条街上招牌并排，认出「哪家是奶茶店」需要先把招牌框对，而不是笼统看一眼整条街。',
+				figure: {
+					kind: 'mmrl',
+					caption:
+						'IoU 定位奖励（数值为示意）：面对招牌并排的街景，模型先输出关键区域 ROI，与标注框计算 IoU，和可验证答案奖励一起构成 RLVR 的训练信号；框到相邻的咖啡店时 IoU 很低，定位奖励随之下降。',
+				},
 			},
 		],
+		tags: ['Multimodal RLVR', 'Data Pipeline', 'Pass@K', 'LLM-as-Judge', 'IoU Localization Reward'],
 		results: {
 			title: '多模态 RLVR 评测结果',
 			cols: ['模型 / 训练阶段', 'MathVista', 'MathVision', 'MathVerse', 'LogicVista', 'Like56', 'STEM200'],
