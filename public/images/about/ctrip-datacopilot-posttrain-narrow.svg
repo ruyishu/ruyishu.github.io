@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 1130" role="img" aria-labelledby="title description">
+  <title id="title">携程 DataCopilot：Harness 与策略模型的后训练闭环，窄屏版</title>
+  <desc id="description">Harness 与策略模型多轮交互产生候选轨迹，经分层采样、去重与执行校验后做 SFT 冷启动与 RLVR（GRPO），新版本在一致的 Harness 配置下做 Benchmark 与回归，失败样本回流。</desc>
+  <defs>
+    <marker id="b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="v" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="g" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="k" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <style>
+      text{font-family:"Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#17233b}
+      .stage{font-size:23px;font-weight:700}.num{font-size:16px;font-weight:700}
+      .label{font-size:19px;font-weight:650}.small{font-size:16px;fill:#52627a}.tiny{font-size:15px;fill:#52627a}
+    </style>
+  </defs>
+  <rect x="1" y="1" width="618" height="1128" rx="15" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- 01 -->
+  <circle cx="49" cy="43" r="19" fill="#eaf2ff"/><text class="num" x="49" y="49" text-anchor="middle" fill="#2563eb">01</text>
+  <text class="stage" x="81" y="51">Harness ⇄ 策略模型</text>
+  <path d="M34 74H586" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+  <rect x="40" y="94" width="540" height="64" rx="11" fill="#f8f6ff" stroke="#b8a9ef" stroke-width="1.8"/>
+  <text class="label" x="310" y="122" text-anchor="middle">Qwen3.8-27B（自研后训练）</text>
+  <text class="tiny" x="310" y="145" text-anchor="middle">策略模型 · 工具选择 · 参数生成 · 多轮分析</text>
+  <path d="M200 158V190" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#b)"/>
+  <text class="tiny" x="210" y="180">工具 + 参数</text>
+  <path d="M420 192V162" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#b)"/>
+  <text class="tiny" x="410" y="180" text-anchor="end">工具返回</text>
+  <rect x="40" y="196" width="540" height="122" rx="11" fill="#f7faff" stroke="#9bbff7" stroke-width="1.7"/>
+  <text class="label" x="60" y="224">Harness</text><text class="tiny" x="140" y="224">统一环境 · 本身不训练</text>
+  <rect x="56" y="238" width="122" height="64" rx="8" fill="#fff" stroke="#c8d8ed"/><text class="tiny" x="117" y="266" text-anchor="middle" style="font-weight:650;fill:#17233b">Memory</text><text class="tiny" x="117" y="288" text-anchor="middle">检索</text>
+  <rect x="186" y="238" width="122" height="64" rx="8" fill="#fff" stroke="#c8d8ed"/><text class="tiny" x="247" y="266" text-anchor="middle" style="font-weight:650;fill:#17233b">Skills</text><text class="tiny" x="247" y="288" text-anchor="middle">加载</text>
+  <rect x="316" y="238" width="122" height="64" rx="8" fill="#fff" stroke="#c8d8ed"/><text class="tiny" x="377" y="266" text-anchor="middle" style="font-weight:650;fill:#17233b">多轮工具</text><text class="tiny" x="377" y="288" text-anchor="middle">调用</text>
+  <rect x="446" y="238" width="120" height="64" rx="8" fill="#fff" stroke="#c8d8ed"/><text class="tiny" x="506" y="266" text-anchor="middle" style="font-weight:650;fill:#17233b">轨迹记录</text><text class="tiny" x="506" y="288" text-anchor="middle">参数与返回</text>
+  <path d="M310 318V352" fill="none" stroke="#2563eb" stroke-width="2.2" marker-end="url(#b)"/>
+  <text class="tiny" x="320" y="340">rollout</text>
+
+  <!-- 02 -->
+  <circle cx="49" cy="385" r="19" fill="#f1edff"/><text class="num" x="49" y="391" text-anchor="middle" fill="#7c3aed">02</text>
+  <text class="stage" x="81" y="393">策略模型后训练</text>
+  <path d="M34 414H586" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/>
+  <rect x="40" y="430" width="540" height="56" rx="10" fill="#f8f6ff" stroke="#d2c8f7" stroke-width="1.5"/>
+  <text class="label" x="310" y="465" text-anchor="middle">候选轨迹（百万级）</text>
+  <path d="M310 486V504" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#v)"/>
+  <rect x="40" y="510" width="540" height="56" rx="10" fill="#fff" stroke="#b8a9ef" stroke-width="1.6"/>
+  <text class="label" x="310" y="545" text-anchor="middle">分层采样 · 去重 · 执行校验</text>
+  <path d="M160 566V584" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#v)"/>
+  <rect x="40" y="590" width="240" height="64" rx="11" fill="#f8f6ff" stroke="#b8a9ef" stroke-width="1.8"/>
+  <text class="label" x="160" y="617" text-anchor="middle">SFT 冷启动</text><text class="tiny" x="160" y="640" text-anchor="middle">验证通过的轨迹</text>
+  <path d="M280 622H332" fill="none" stroke="#7c3aed" stroke-width="2.2" marker-end="url(#v)"/>
+  <text class="tiny" x="306" y="612" text-anchor="middle" font-size="13">初始化</text>
+  <rect x="340" y="590" width="240" height="64" rx="11" fill="#f1edff" stroke="#7c3aed" stroke-width="2"/>
+  <text class="label" x="460" y="617" text-anchor="middle">RLVR（GRPO）</text><text class="tiny" x="460" y="640" text-anchor="middle">结果正确性奖励</text>
+  <text class="tiny" x="310" y="678" text-anchor="middle">奖励来自可自动验算的任务；更新后回到同一 Harness 再 rollout</text>
+  <path d="M580 622H602V112H586" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#v)"/>
+  <path d="M460 690V722" fill="none" stroke="#059669" stroke-width="2.2" marker-end="url(#g)"/>
+  <text class="tiny" x="470" y="712">新版本</text>
+
+  <!-- 03 -->
+  <circle cx="49" cy="745" r="19" fill="#e8f7f0"/><text class="num" x="49" y="751" text-anchor="middle" fill="#059669">03</text>
+  <text class="stage" x="81" y="753">Benchmark 与回归</text>
+  <path d="M34 774H586" stroke="#059669" stroke-width="3" stroke-linecap="round"/>
+  <rect x="40" y="790" width="540" height="88" rx="10" fill="#f5fcf8" stroke="#b7dfcb" stroke-width="1.5"/>
+  <text class="label" x="310" y="816" text-anchor="middle">4 个评测集</text>
+  <text class="tiny" x="310" y="840" text-anchor="middle">4L-SkillBench（Skill）· Router-Bench（专家路由）</text>
+  <text class="tiny" x="310" y="862" text-anchor="middle">Data-Ana-Bench（全局结果）· Memory 评测</text>
+  <path d="M310 878V894" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#g)"/>
+  <rect x="40" y="900" width="540" height="88" rx="10" fill="#fff" stroke="#8fd0b0" stroke-width="1.7"/>
+  <text class="label" x="310" y="926" text-anchor="middle">一致的 Harness 配置 · 接入 4 个模型</text>
+  <text class="tiny" x="310" y="950" text-anchor="middle">DeepSeek · Qwen3.8-Max · Kiro-Opus-5.5 · Qwen3.8-27B</text>
+  <text class="tiny" x="310" y="972" text-anchor="middle">任务完成率 · 结果正确性 · 工具调用有效性</text>
+  <path d="M310 988V1004" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#g)"/>
+  <rect x="40" y="1010" width="540" height="56" rx="10" fill="#fff" stroke="#8fd0b0" stroke-width="1.7"/>
+  <text class="label" x="310" y="1044" text-anchor="middle">执行轨迹定位失败环节</text>
+  <path d="M40 1038H20V458H36" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#k)"/>
+  <text class="small" x="310" y="1102" text-anchor="middle">失败样本回流至下一轮训练任务与轨迹数据</text>
+</svg>

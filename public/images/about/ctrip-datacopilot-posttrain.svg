@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 600" role="img" aria-labelledby="title description">
+  <title id="title">携程 DataCopilot：Harness 与策略模型的后训练闭环</title>
+  <desc id="description">策略模型（自研后训练的 Qwen3.8-27B）在 Harness 中多轮 rollout，Harness 负责 Memory 检索、Skills 加载、多轮工具调用与轨迹记录；百万级候选轨迹经分层采样、去重与执行校验，验证通过的轨迹用于 SFT 冷启动，再以可自动验算任务和结果正确性奖励做 RLVR（GRPO）更新策略模型，下一轮 rollout 仍走同一 Harness；新版本与 DeepSeek、Qwen3.8-Max、Kiro-Opus-5.5 一起在一致的 Harness 配置下，用 4L-SkillBench、Router-Bench、Data-Ana-Bench 与 Memory 评测做 Benchmark 与回归，按执行轨迹定位失败环节并回流。</desc>
+  <defs>
+    <marker id="a-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#2563eb" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="a-violet" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#7c3aed" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="a-green" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#059669" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="a-gray" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 7 4 1 7" fill="none" stroke="#64748b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <style>
+      text{font-family:"Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#17233b}
+      .stage{font-size:21px;font-weight:700}
+      .num{font-size:15px;font-weight:700}
+      .label{font-size:17px;font-weight:650}
+      .small{font-size:14.5px;fill:#52627a}
+      .tiny{font-size:13.5px;fill:#52627a}
+      .mono{font-family:ui-monospace,Consolas,monospace;font-size:14px;fill:#52627a}
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="1238" height="598" rx="15" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+  <path d="M415 84V510M838 84V510" fill="none" stroke="#dbe3ef" stroke-width="1.5" stroke-dasharray="5 7"/>
+
+  <!-- stage headers -->
+  <circle cx="55" cy="42" r="18" fill="#eaf2ff"/><text class="num" x="55" y="48" text-anchor="middle" fill="#2563eb">01</text>
+  <text class="stage" x="86" y="49">Harness 运行框架</text>
+  <text class="tiny" x="270" y="49">统一环境 · 本身不训练</text>
+  <path d="M40 68H392" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+
+  <circle cx="463" cy="42" r="18" fill="#f1edff"/><text class="num" x="463" y="48" text-anchor="middle" fill="#7c3aed">02</text>
+  <text class="stage" x="494" y="49">策略模型后训练</text>
+  <path d="M448 68H814" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/>
+
+  <circle cx="886" cy="42" r="18" fill="#e8f7f0"/><text class="num" x="886" y="48" text-anchor="middle" fill="#059669">03</text>
+  <text class="stage" x="917" y="49">Benchmark 与回归</text>
+  <path d="M871 68H1200" stroke="#059669" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- policy update loop (top) -->
+  <path d="M790 326H822V98H215V120" fill="none" stroke="#7c3aed" stroke-width="2.2" marker-end="url(#a-violet)"/>
+  <text class="tiny" x="452" y="91" fill="#7c3aed" style="fill:#7c3aed">更新策略参数 → 下一轮 rollout 仍走同一 Harness</text>
+
+  <!-- 01 policy -->
+  <rect x="60" y="124" width="310" height="76" rx="11" fill="#f8f6ff" stroke="#b8a9ef" stroke-width="1.8"/>
+  <text class="label" x="215" y="155" text-anchor="middle">Qwen3.8-27B（自研后训练）</text>
+  <text class="tiny" x="215" y="181" text-anchor="middle">策略模型 · 工具选择 · 参数生成 · 多轮分析</text>
+
+  <path d="M120 200V238" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#a-blue)"/>
+  <text class="tiny" x="130" y="224">工具 + 参数</text>
+  <path d="M310 240V204" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#a-blue)"/>
+  <text class="tiny" x="300" y="224" text-anchor="end">工具返回</text>
+
+  <!-- 01 harness -->
+  <rect x="50" y="244" width="330" height="222" rx="11" fill="#f7faff" stroke="#9bbff7" stroke-width="1.7"/>
+  <text class="label" x="70" y="273">Harness</text>
+  <text class="tiny" x="146" y="273">多轮交互环境</text>
+  <path d="M70 286H360" stroke="#d5e5fc" stroke-width="1.5"/>
+  <rect x="68" y="298" width="146" height="72" rx="8" fill="#fff" stroke="#c8d8ed"/>
+  <text class="label" x="141" y="328" text-anchor="middle">Memory 检索</text>
+  <text class="tiny" x="141" y="352" text-anchor="middle">多轮上下文延续</text>
+  <rect x="226" y="298" width="140" height="72" rx="8" fill="#fff" stroke="#c8d8ed"/>
+  <text class="label" x="296" y="328" text-anchor="middle">Skills 加载</text>
+  <text class="tiny" x="296" y="352" text-anchor="middle">任务指引 · 工具规范</text>
+  <rect x="68" y="380" width="146" height="72" rx="8" fill="#fff" stroke="#c8d8ed"/>
+  <text class="label" x="141" y="410" text-anchor="middle">多轮工具调用</text>
+  <text class="tiny" x="141" y="434" text-anchor="middle">取数 · 指标计算</text>
+  <rect x="226" y="380" width="140" height="72" rx="8" fill="#fff" stroke="#c8d8ed"/>
+  <text class="label" x="296" y="410" text-anchor="middle">轨迹记录</text>
+  <text class="tiny" x="296" y="434" text-anchor="middle">每轮参数与返回</text>
+  <text class="tiny" x="215" y="492" text-anchor="middle">同一环境支撑轨迹采样、执行回放与评测</text>
+
+  <!-- rollout to candidates -->
+  <path d="M380 300H420V157H452" fill="none" stroke="#2563eb" stroke-width="2.4" marker-end="url(#a-blue)"/>
+  <text class="tiny" x="424" y="232" transform="rotate(-90 424 232)" text-anchor="middle" dy="-6">rollout 轨迹</text>
+
+  <!-- 02 pipeline -->
+  <rect x="460" y="124" width="330" height="66" rx="10" fill="#f8f6ff" stroke="#d2c8f7" stroke-width="1.5"/>
+  <text class="label" x="625" y="152" text-anchor="middle">候选轨迹（百万级）</text>
+  <text class="tiny" x="625" y="176" text-anchor="middle">多轮 rollout 产出 · 完整调用记录</text>
+  <path d="M625 190V208" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#a-violet)"/>
+
+  <rect x="460" y="214" width="330" height="66" rx="10" fill="#fff" stroke="#b8a9ef" stroke-width="1.6"/>
+  <text class="label" x="625" y="242" text-anchor="middle">分层采样 · 去重 · 执行校验</text>
+  <text class="tiny" x="625" y="266" text-anchor="middle">按任务类型分层，回放执行核对结果</text>
+  <path d="M532 280V290" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#a-violet)"/>
+
+  <rect x="460" y="296" width="145" height="62" rx="11" fill="#f8f6ff" stroke="#b8a9ef" stroke-width="1.8"/>
+  <text class="label" x="532" y="322" text-anchor="middle">SFT 冷启动</text>
+  <text class="tiny" x="532" y="345" text-anchor="middle">验证通过的轨迹</text>
+  <path d="M605 327H637" fill="none" stroke="#7c3aed" stroke-width="2.4" marker-end="url(#a-violet)"/>
+  <rect x="645" y="296" width="145" height="62" rx="11" fill="#f1edff" stroke="#7c3aed" stroke-width="2"/>
+  <text class="label" x="717" y="322" text-anchor="middle">RLVR（GRPO）</text>
+  <text class="tiny" x="717" y="345" text-anchor="middle">组内相对优势</text>
+  <text class="tiny" x="625" y="376" text-anchor="middle" font-size="12">SFT → RL 初始化</text>
+
+  <path d="M717 404V364" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#a-violet)"/>
+  <rect x="460" y="408" width="330" height="62" rx="10" fill="#fff" stroke="#d2c8f7" stroke-width="1.5"/>
+  <text class="label" x="625" y="434" text-anchor="middle">可自动验算的任务</text>
+  <text class="tiny" x="625" y="457" text-anchor="middle">结果正确性奖励（取数 / 指标可复算）</text>
+
+  <!-- new version to eval -->
+  <path d="M822 272H852" fill="none" stroke="#059669" stroke-width="2.2" marker-end="url(#a-green)"/>
+  <text class="tiny" x="837" y="262" text-anchor="middle">新版本</text>
+
+  <!-- 03 eval -->
+  <rect x="860" y="112" width="340" height="104" rx="10" fill="#f5fcf8" stroke="#b7dfcb" stroke-width="1.5"/>
+  <text class="label" x="876" y="136">4 个评测集</text>
+  <rect x="872" y="146" width="156" height="30" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="950" y="166" text-anchor="middle">4L-SkillBench · Skill</text>
+  <rect x="1034" y="146" width="156" height="30" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="1112" y="166" text-anchor="middle">Router-Bench · 专家路由</text>
+  <rect x="872" y="180" width="156" height="30" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="950" y="200" text-anchor="middle">Data-Ana-Bench · 全局</text>
+  <rect x="1034" y="180" width="156" height="30" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="1112" y="200" text-anchor="middle">Memory 评测 · Memory</text>
+  <path d="M1030 216V226" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#a-green)"/>
+
+  <rect x="860" y="230" width="340" height="86" rx="10" fill="#fff" stroke="#8fd0b0" stroke-width="1.7"/>
+  <text class="label" x="1030" y="256" text-anchor="middle">一致的 Harness 配置 · 接入 4 个模型</text>
+  <text class="tiny" x="1030" y="280" text-anchor="middle">DeepSeek · Qwen3.8-Max · Kiro-Opus-5.5</text>
+  <text class="tiny" x="1030" y="302" text-anchor="middle">Qwen3.8-27B（自研后训练）</text>
+  <path d="M1030 316V324" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#a-green)"/>
+
+  <rect x="860" y="328" width="340" height="68" rx="10" fill="#f5fcf8" stroke="#b7dfcb" stroke-width="1.5"/>
+  <text class="small" x="876" y="347">回归指标</text>
+  <rect x="872" y="354" width="96" height="34" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="920" y="376" text-anchor="middle">任务完成率</text>
+  <rect x="976" y="354" width="96" height="34" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="1024" y="376" text-anchor="middle">结果正确性</text>
+  <rect x="1080" y="354" width="112" height="34" rx="6" fill="#fff" stroke="#b7dfcb"/>
+  <text class="tiny" x="1136" y="376" text-anchor="middle">工具调用有效性</text>
+  <path d="M1030 396V404" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#a-green)"/>
+
+  <rect x="860" y="408" width="340" height="62" rx="10" fill="#fff" stroke="#8fd0b0" stroke-width="1.7"/>
+  <text class="label" x="1030" y="434" text-anchor="middle">执行轨迹定位失败环节</text>
+  <text class="tiny" x="1030" y="457" text-anchor="middle">选错工具 / 参数错误 / 结论偏差</text>
+
+  <!-- failure feedback -->
+  <path d="M1030 470V540H625V476" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#a-gray)"/>
+  <text class="small" x="828" y="566" text-anchor="middle">失败样本回流：补充下一轮训练任务与轨迹数据</text>
+</svg>
